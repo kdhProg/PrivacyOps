@@ -8,7 +8,9 @@ import io.github.privacyops.analyzer.mybatis.MyBatisMapperScanner;
 import io.github.privacyops.analyzer.policy.YamlPolicyProvider;
 import io.github.privacyops.analyzer.project.DefaultProjectScanner;
 
+import io.github.privacyops.analyzer.rule.MissingDisposalPolicyRule;
 import io.github.privacyops.analyzer.rule.MissingResourcePolicyRule;
+import io.github.privacyops.analyzer.rule.MissingRetentionPolicyRule;
 import io.github.privacyops.analyzer.spring.SpringControllerScanner;
 import io.github.privacyops.fact.MapperColumnFact;
 import io.github.privacyops.fact.MapperQueryFact;
@@ -173,7 +175,9 @@ public class ScanCommand implements Callable<Integer> {
         List<PrivacyRule> rules =
                 List.of(
                         new ApiPrivacyExposureRule(),
-                        new MissingResourcePolicyRule()
+                        new MissingResourcePolicyRule(),
+                        new MissingRetentionPolicyRule(),
+                        new MissingDisposalPolicyRule()
                 );
 
         // 9. Rule 실행
@@ -643,15 +647,32 @@ public class ScanCommand implements Callable<Integer> {
 
                             System.out.println(
                                     "  retention : "
-                                            + resource.retention()
+                                            + displayPolicyValue(
+                                            resource.retention()
+                                    )
                             );
 
                             System.out.println(
                                     "  disposal  : "
-                                            + resource.disposal()
+                                            + displayPolicyValue(
+                                            resource.disposal()
+                                    )
                             );
                         }
                 );
+    }
+
+    private String displayPolicyValue(
+            String value
+    ) {
+
+        if (value == null
+                || value.isBlank()) {
+
+            return "NOT SET";
+        }
+
+        return value;
     }
 
 }

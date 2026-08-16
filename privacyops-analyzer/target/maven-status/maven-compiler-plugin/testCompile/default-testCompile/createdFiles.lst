@@ -1,9 +1,11 @@
 io\github\privacyops\analyzer\rule\ApiPrivacyExposureRuleTest.class
+io\github\privacyops\analyzer\rule\MissingRetentionPolicyRuleTest.class
 io\github\privacyops\analyzer\flow\MapperResultFlowLinkerTest.class
 io\github\privacyops\analyzer\java\JavaSourceScannerTest.class
 io\github\privacyops\analyzer\mybatis\MyBatisMapperScannerTest.class
 io\github\privacyops\analyzer\flow\ControllerResponseFlowLinkerTest.class
 io\github\privacyops\analyzer\spring\SpringControllerScannerTest.class
+io\github\privacyops\analyzer\rule\MissingDisposalPolicyRuleTest.class
 io\github\privacyops\analyzer\policy\YamlPolicyProviderTest.class
 io\github\privacyops\analyzer\rule\MissingResourcePolicyRuleTest.class
 io\github\privacyops\analyzer\classifier\NamePatternPrivacyClassifierTest.class

@@ -6,5 +6,7 @@ D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analy
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\policy\YamlPolicyProviderTest.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\project\DefaultProjectScannerTest.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\rule\ApiPrivacyExposureRuleTest.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\rule\MissingDisposalPolicyRuleTest.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\rule\MissingResourcePolicyRuleTest.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\rule\MissingRetentionPolicyRuleTest.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\spring\SpringControllerScannerTest.java
