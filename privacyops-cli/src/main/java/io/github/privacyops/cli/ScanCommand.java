@@ -5,12 +5,18 @@ import io.github.privacyops.analyzer.classifier.NamePatternPrivacyClassifier;
 import io.github.privacyops.analyzer.java.JavaSourceScanner;
 import io.github.privacyops.analyzer.project.DefaultProjectScanner;
 
+import io.github.privacyops.analyzer.spring.SpringControllerScanner;
 import io.github.privacyops.model.ClassifiedFact;
 import io.github.privacyops.model.PrivacyType;
 import io.github.privacyops.scan.ScanResult;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
+
+import io.github.privacyops.analyzer.flow.ControllerResponseFlowLinker;
+import io.github.privacyops.fact.ApiEndpointFact;
+import io.github.privacyops.fact.JavaFieldFact;
+import io.github.privacyops.flow.DataFlowEdge;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +42,7 @@ public class ScanCommand implements Callable<Integer> {
     @Override
     public Integer call() {
 
+
         if (!Files.isDirectory(projectPath)) {
 
             System.err.println(
@@ -49,7 +56,8 @@ public class ScanCommand implements Callable<Integer> {
         DefaultProjectScanner projectScanner =
                 new DefaultProjectScanner(
                         List.of(
-                                new JavaSourceScanner()
+                                new JavaSourceScanner(),
+                                new SpringControllerScanner()
                         )
                 );
 
@@ -176,4 +184,96 @@ public class ScanCommand implements Callable<Integer> {
                                 )
                 );
     }
+
+
+    private void printApiFlows(
+            List<io.github.privacyops.fact.Fact> facts,
+            List<ClassifiedFact> classifiedFacts,
+            List<DataFlowEdge> edges
+    ) {
+
+        System.out.println();
+        System.out.println("API Privacy Flows");
+        System.out.println(
+                "--------------------------------"
+        );
+
+        for (DataFlowEdge edge : edges) {
+
+            ApiEndpointFact endpoint =
+                    facts.stream()
+                            .filter(
+                                    fact ->
+                                            fact.id()
+                                                    .equals(
+                                                            edge.targetFactId()
+                                                    )
+                            )
+                            .filter(
+                                    ApiEndpointFact.class
+                                            ::isInstance
+                            )
+                            .map(
+                                    ApiEndpointFact.class
+                                            ::cast
+                            )
+                            .findFirst()
+                            .orElse(null);
+
+            JavaFieldFact field =
+                    facts.stream()
+                            .filter(
+                                    fact ->
+                                            fact.id()
+                                                    .equals(
+                                                            edge.sourceFactId()
+                                                    )
+                            )
+                            .filter(
+                                    JavaFieldFact.class
+                                            ::isInstance
+                            )
+                            .map(
+                                    JavaFieldFact.class
+                                            ::cast
+                            )
+                            .findFirst()
+                            .orElse(null);
+
+            if (endpoint == null
+                    || field == null) {
+                continue;
+            }
+
+            classifiedFacts.stream()
+                    .filter(
+                            classified ->
+                                    classified.fact()
+                                            .id()
+                                            .equals(
+                                                    field.id()
+                                            )
+                    )
+                    .findFirst()
+                    .ifPresent(
+                            classified -> {
+
+                                System.out.printf(
+                                        "%s %s%n",
+                                        endpoint.httpMethod(),
+                                        endpoint.path()
+                                );
+
+                                System.out.printf(
+                                        "  %-18s -> %s%n",
+                                        field.fieldName(),
+                                        classified
+                                                .classification()
+                                                .privacyType()
+                                );
+                            }
+                    );
+        }
+    }
+
 }
