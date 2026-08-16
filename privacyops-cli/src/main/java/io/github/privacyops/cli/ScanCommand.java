@@ -5,16 +5,20 @@ import io.github.privacyops.analyzer.classifier.NamePatternPrivacyClassifier;
 import io.github.privacyops.analyzer.flow.MapperResultFlowLinker;
 import io.github.privacyops.analyzer.java.JavaSourceScanner;
 import io.github.privacyops.analyzer.mybatis.MyBatisMapperScanner;
+import io.github.privacyops.analyzer.policy.YamlPolicyProvider;
 import io.github.privacyops.analyzer.project.DefaultProjectScanner;
 
+import io.github.privacyops.analyzer.rule.MissingResourcePolicyRule;
 import io.github.privacyops.analyzer.spring.SpringControllerScanner;
 import io.github.privacyops.fact.MapperColumnFact;
 import io.github.privacyops.fact.MapperQueryFact;
 import io.github.privacyops.flow.DataFlowRelation;
 import io.github.privacyops.model.ClassifiedFact;
 import io.github.privacyops.model.PrivacyType;
+import io.github.privacyops.policy.PrivacyPolicy;
 import io.github.privacyops.scan.ScanResult;
 
+import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -38,6 +42,8 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.ArrayList;
 
+import static picocli.CommandLine.*;
+
 
 @Command(
         name = "scan",
@@ -45,6 +51,18 @@ import java.util.ArrayList;
         mixinStandardHelpOptions = true
 )
 public class ScanCommand implements Callable<Integer> {
+
+    @Option(
+            names = {
+                    "-p",
+                    "--policy"
+            },
+            paramLabel = "<policy-file>",
+            description =
+                    "Privacy policy YAML file."
+    )
+    private Path policyPath;
+
 
     @Parameters(
             index = "0",
@@ -56,7 +74,7 @@ public class ScanCommand implements Callable<Integer> {
     @Override
     public Integer call() {
 
-
+        // 1. 프로젝트 경로 검증
         if (!Files.isDirectory(projectPath)) {
 
             System.err.println(
@@ -67,6 +85,32 @@ public class ScanCommand implements Callable<Integer> {
             return 2;
         }
 
+        // 2. Privacy Policy 로딩
+        PrivacyPolicy privacyPolicy =
+                PrivacyPolicy.empty();
+
+        if (policyPath != null) {
+
+            if (!Files.isRegularFile(policyPath)) {
+
+                System.err.println(
+                        "Policy file does not exist: "
+                                + policyPath
+                );
+
+                return 2;
+            }
+
+            YamlPolicyProvider policyProvider =
+                    new YamlPolicyProvider();
+
+            privacyPolicy =
+                    policyProvider.load(
+                            policyPath
+                    );
+        }
+
+        // 3. Scanner 구성
         DefaultProjectScanner projectScanner =
                 new DefaultProjectScanner(
                         List.of(
@@ -76,6 +120,7 @@ public class ScanCommand implements Callable<Integer> {
                         )
                 );
 
+        // 4. 분석 서비스 구성
         PrivacyAnalysisService analysisService =
                 new PrivacyAnalysisService(
                         projectScanner,
@@ -84,6 +129,7 @@ public class ScanCommand implements Callable<Integer> {
                         )
                 );
 
+        // 5. 프로젝트 Scan
         ScanResult scanResult =
                 analysisService.scan(projectPath);
 
@@ -92,7 +138,7 @@ public class ScanCommand implements Callable<Integer> {
                         scanResult.facts()
                 );
 
-// 1. 데이터 흐름 연결
+        // 6. 데이터 흐름 연결
         List<DataFlowEdge> edges =
                 new ArrayList<>();
 
@@ -114,21 +160,23 @@ public class ScanCommand implements Callable<Integer> {
                 )
         );
 
-// 2. Rule 평가용 Context 생성
+        // 7. Rule 평가용 Context 생성
         RuleContext ruleContext =
                 new RuleContext(
                         scanResult.facts(),
                         classifiedFacts,
-                        edges
+                        edges,
+                        privacyPolicy
                 );
 
-// 3. 실행할 Rule 등록
+        // 8. 실행 Rule 등록
         List<PrivacyRule> rules =
                 List.of(
-                        new ApiPrivacyExposureRule()
+                        new ApiPrivacyExposureRule(),
+                        new MissingResourcePolicyRule()
                 );
 
-// 4. Rule 실행 → Finding 생성
+        // 9. Rule 실행
         List<Finding> findings =
                 rules.stream()
                         .flatMap(
@@ -138,11 +186,15 @@ public class ScanCommand implements Callable<Integer> {
                         )
                         .toList();
 
-// 5. 결과 출력
+        // 10. 결과 출력
         printSummary(
                 projectPath,
                 scanResult,
                 classifiedFacts
+        );
+
+        printPolicyStatus(
+                privacyPolicy
         );
 
         printMapperQueries(
@@ -161,7 +213,9 @@ public class ScanCommand implements Callable<Integer> {
                 edges
         );
 
-        printFindings(findings);
+        printFindings(
+                findings
+        );
 
         return 0;
     }
@@ -553,6 +607,51 @@ public class ScanCommand implements Callable<Integer> {
                             .privacyType()
             );
         }
+    }
+
+    private void printPolicyStatus(
+            PrivacyPolicy policy
+    ) {
+
+        System.out.println();
+        System.out.println("Privacy Policies");
+        System.out.println(
+                "--------------------------------"
+        );
+
+        if (policy.resources().isEmpty()) {
+
+            System.out.println(
+                    "No resource policies loaded."
+            );
+
+            return;
+        }
+
+        policy.resources()
+                .forEach(
+                        (resourceName, resource) -> {
+
+                            System.out.println(
+                                    resourceName
+                            );
+
+                            System.out.println(
+                                    "  purpose   : "
+                                            + resource.purpose()
+                            );
+
+                            System.out.println(
+                                    "  retention : "
+                                            + resource.retention()
+                            );
+
+                            System.out.println(
+                                    "  disposal  : "
+                                            + resource.disposal()
+                            );
+                        }
+                );
     }
 
 }

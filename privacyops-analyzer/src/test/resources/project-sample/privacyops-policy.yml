@@ -1,0 +1,6 @@
+resources:
+
+  TB_MEMBER:
+    purpose: member-management
+    retention: 3y
+    disposal: scheduled-delete

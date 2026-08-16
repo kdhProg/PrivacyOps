@@ -3,6 +3,7 @@ D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domai
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\fact\DatabaseColumnFact.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\fact\Fact.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\fact\JavaFieldFact.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\fact\MapperColumnFact.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\fact\MapperQueryFact.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\flow\DataFlowEdge.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\flow\DataFlowLinker.java
@@ -13,6 +14,9 @@ D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domai
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\model\PrivacyType.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\model\Severity.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\model\SourceLocation.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\policy\PolicyProvider.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\policy\PrivacyPolicy.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\policy\ResourcePolicy.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\rule\PrivacyRule.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\rule\RuleContext.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\scan\ArtifactScanner.java

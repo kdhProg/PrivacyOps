@@ -1,9 +1,12 @@
 io\github\privacyops\analyzer\classifier\NamePatternPrivacyClassifier.class
 io\github\privacyops\analyzer\mybatis\MyBatisMapperScanner.class
-org\example\Main.class
 io\github\privacyops\analyzer\java\JavaSourceScanner.class
-io\github\privacyops\analyzer\PrivacyAnalysisService.class
+io\github\privacyops\analyzer\flow\MapperResultFlowLinker.class
 io\github\privacyops\analyzer\project\DefaultProjectScanner.class
+io\github\privacyops\analyzer\policy\YamlPolicyProvider.class
+io\github\privacyops\analyzer\rule\MissingResourcePolicyRule.class
+org\example\Main.class
+io\github\privacyops\analyzer\PrivacyAnalysisService.class
 io\github\privacyops\analyzer\rule\ApiPrivacyExposureRule$1.class
 io\github\privacyops\analyzer\spring\SpringControllerScanner.class
 io\github\privacyops\analyzer\rule\ApiPrivacyExposureRule.class

@@ -14,6 +14,7 @@ import io.github.privacyops.model.PrivacyType;
 import io.github.privacyops.model.Severity;
 import io.github.privacyops.model.SourceLocation;
 
+import io.github.privacyops.policy.PrivacyPolicy;
 import io.github.privacyops.rule.RuleContext;
 
 import org.junit.jupiter.api.Test;
@@ -82,7 +83,8 @@ class ApiPrivacyExposureRuleTest {
                         ),
                         List.of(
                                 edge
-                        )
+                        ),
+                        PrivacyPolicy.empty()
                 );
 
         ApiPrivacyExposureRule rule =
@@ -162,7 +164,8 @@ class ApiPrivacyExposureRuleTest {
                         List.of(),
                         List.of(
                                 edge
-                        )
+                        ),
+                        PrivacyPolicy.empty()
                 );
 
         ApiPrivacyExposureRule rule =

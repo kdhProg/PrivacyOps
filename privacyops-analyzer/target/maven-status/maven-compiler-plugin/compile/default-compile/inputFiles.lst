@@ -1,9 +1,12 @@
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\classifier\NamePatternPrivacyClassifier.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\flow\ControllerResponseFlowLinker.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\flow\MapperResultFlowLinker.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\java\JavaSourceScanner.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\mybatis\MyBatisMapperScanner.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\policy\YamlPolicyProvider.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\PrivacyAnalysisService.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\project\DefaultProjectScanner.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\ApiPrivacyExposureRule.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\MissingResourcePolicyRule.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\spring\SpringControllerScanner.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\org\example\Main.java
