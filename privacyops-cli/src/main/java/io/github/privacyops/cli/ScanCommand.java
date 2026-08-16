@@ -13,6 +13,13 @@ import io.github.privacyops.scan.ScanResult;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
+import io.github.privacyops.analyzer.rule.ApiPrivacyExposureRule;
+
+import io.github.privacyops.model.Finding;
+
+import io.github.privacyops.rule.PrivacyRule;
+import io.github.privacyops.rule.RuleContext;
+
 import io.github.privacyops.analyzer.flow.ControllerResponseFlowLinker;
 import io.github.privacyops.fact.ApiEndpointFact;
 import io.github.privacyops.fact.JavaFieldFact;
@@ -77,11 +84,53 @@ public class ScanCommand implements Callable<Integer> {
                         scanResult.facts()
                 );
 
+// 1. 데이터 흐름 연결
+        ControllerResponseFlowLinker flowLinker =
+                new ControllerResponseFlowLinker();
+
+        List<DataFlowEdge> edges =
+                flowLinker.link(
+                        scanResult.facts()
+                );
+
+// 2. Rule 평가용 Context 생성
+        RuleContext ruleContext =
+                new RuleContext(
+                        scanResult.facts(),
+                        classifiedFacts,
+                        edges
+                );
+
+// 3. 실행할 Rule 등록
+        List<PrivacyRule> rules =
+                List.of(
+                        new ApiPrivacyExposureRule()
+                );
+
+// 4. Rule 실행 → Finding 생성
+        List<Finding> findings =
+                rules.stream()
+                        .flatMap(
+                                rule ->
+                                        rule.evaluate(ruleContext)
+                                                .stream()
+                        )
+                        .toList();
+
+// 5. 결과 출력
         printSummary(
                 projectPath,
                 scanResult,
                 classifiedFacts
         );
+
+        printApiFlows(
+                scanResult.facts(),
+                classifiedFacts,
+                edges
+        );
+
+        printFindings(findings);
 
         return 0;
     }
@@ -273,6 +322,54 @@ public class ScanCommand implements Callable<Integer> {
                                 );
                             }
                     );
+        }
+    }
+
+    private void printFindings(
+            List<Finding> findings
+    ) {
+
+        System.out.println();
+        System.out.println("Findings");
+        System.out.println(
+                "--------------------------------"
+        );
+
+        if (findings.isEmpty()) {
+
+            System.out.println(
+                    "No privacy findings."
+            );
+
+            return;
+        }
+
+        for (Finding finding : findings) {
+
+            System.out.printf(
+                    "[%s] %s%n",
+                    finding.severity(),
+                    finding.ruleId()
+            );
+
+            System.out.println(
+                    finding.title()
+            );
+
+            System.out.println(
+                    finding.description()
+            );
+
+            if (finding.location() != null) {
+
+                System.out.printf(
+                        "Location: %s:%s%n",
+                        finding.location().file(),
+                        finding.location().line()
+                );
+            }
+
+            System.out.println();
         }
     }
 
