@@ -1,40 +1,21 @@
 package io.github.privacyops.cli;
 
-import io.github.privacyops.analyzer.PrivacyAnalysisService;
-import io.github.privacyops.analyzer.classifier.NamePatternPrivacyClassifier;
-import io.github.privacyops.analyzer.flow.MapperResultFlowLinker;
-import io.github.privacyops.analyzer.java.JavaSourceScanner;
-import io.github.privacyops.analyzer.mybatis.MyBatisMapperScanner;
+import io.github.privacyops.analyzer.engine.PrivacyOpsEngineFactory;
 import io.github.privacyops.analyzer.policy.YamlPolicyProvider;
-import io.github.privacyops.analyzer.project.DefaultProjectScanner;
-
-import io.github.privacyops.analyzer.rule.MissingDisposalPolicyRule;
-import io.github.privacyops.analyzer.rule.MissingResourcePolicyRule;
-import io.github.privacyops.analyzer.rule.MissingRetentionPolicyRule;
-import io.github.privacyops.analyzer.spring.SpringControllerScanner;
-import io.github.privacyops.fact.MapperColumnFact;
-import io.github.privacyops.fact.MapperQueryFact;
-import io.github.privacyops.flow.DataFlowRelation;
-import io.github.privacyops.model.ClassifiedFact;
-import io.github.privacyops.model.PrivacyType;
-import io.github.privacyops.policy.PrivacyPolicy;
-import io.github.privacyops.scan.ScanResult;
-
-import picocli.CommandLine;
-import picocli.CommandLine.Command;
-import picocli.CommandLine.Parameters;
-
-import io.github.privacyops.analyzer.rule.ApiPrivacyExposureRule;
-
-import io.github.privacyops.model.Finding;
-
-import io.github.privacyops.rule.PrivacyRule;
-import io.github.privacyops.rule.RuleContext;
-
-import io.github.privacyops.analyzer.flow.ControllerResponseFlowLinker;
+import io.github.privacyops.engine.PrivacyOpsEngine;
 import io.github.privacyops.fact.ApiEndpointFact;
 import io.github.privacyops.fact.JavaFieldFact;
+import io.github.privacyops.fact.MapperColumnFact;
+import io.github.privacyops.fact.MapperQueryFact;
 import io.github.privacyops.flow.DataFlowEdge;
+import io.github.privacyops.flow.DataFlowRelation;
+import io.github.privacyops.model.AnalysisResult;
+import io.github.privacyops.model.ClassifiedFact;
+import io.github.privacyops.model.Finding;
+import io.github.privacyops.model.PrivacyType;
+import io.github.privacyops.policy.PrivacyPolicy;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Parameters;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,9 +23,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.ArrayList;
 
-import static picocli.CommandLine.*;
+import static picocli.CommandLine.Option;
 
 
 @Command(
@@ -112,113 +92,46 @@ public class ScanCommand implements Callable<Integer> {
                     );
         }
 
-        // 3. Scanner 구성
-        DefaultProjectScanner projectScanner =
-                new DefaultProjectScanner(
-                        List.of(
-                                new JavaSourceScanner(),
-                                new SpringControllerScanner(),
-                                new MyBatisMapperScanner()
-                        )
-                );
+        // 3. PrivacyOps Engine 생성
+        PrivacyOpsEngine engine =
+                PrivacyOpsEngineFactory
+                        .createDefault();
 
-        // 4. 분석 서비스 구성
-        PrivacyAnalysisService analysisService =
-                new PrivacyAnalysisService(
-                        projectScanner,
-                        List.of(
-                                new NamePatternPrivacyClassifier()
-                        )
-                );
-
-        // 5. 프로젝트 Scan
-        ScanResult scanResult =
-                analysisService.scan(projectPath);
-
-        List<ClassifiedFact> classifiedFacts =
-                analysisService.classify(
-                        scanResult.facts()
-                );
-
-        // 6. 데이터 흐름 연결
-        List<DataFlowEdge> edges =
-                new ArrayList<>();
-
-        MapperResultFlowLinker mapperFlowLinker =
-                new MapperResultFlowLinker();
-
-        edges.addAll(
-                mapperFlowLinker.link(
-                        scanResult.facts()
-                )
-        );
-
-        ControllerResponseFlowLinker apiFlowLinker =
-                new ControllerResponseFlowLinker();
-
-        edges.addAll(
-                apiFlowLinker.link(
-                        scanResult.facts()
-                )
-        );
-
-        // 7. Rule 평가용 Context 생성
-        RuleContext ruleContext =
-                new RuleContext(
-                        scanResult.facts(),
-                        classifiedFacts,
-                        edges,
+        // 4. 전체 분석 실행
+        AnalysisResult result =
+                engine.analyze(
+                        projectPath,
                         privacyPolicy
                 );
 
-        // 8. 실행 Rule 등록
-        List<PrivacyRule> rules =
-                List.of(
-                        new ApiPrivacyExposureRule(),
-                        new MissingResourcePolicyRule(),
-                        new MissingRetentionPolicyRule(),
-                        new MissingDisposalPolicyRule()
-                );
-
-        // 9. Rule 실행
-        List<Finding> findings =
-                rules.stream()
-                        .flatMap(
-                                rule ->
-                                        rule.evaluate(ruleContext)
-                                                .stream()
-                        )
-                        .toList();
-
-        // 10. 결과 출력
+        // 5. 결과 출력
         printSummary(
                 projectPath,
-                scanResult,
-                classifiedFacts
+                result
         );
 
         printPolicyStatus(
-                privacyPolicy
+                result.policy()
         );
 
         printMapperQueries(
-                scanResult.facts()
+                result.facts()
         );
 
         printMapperFlows(
-                scanResult.facts(),
-                classifiedFacts,
-                edges
+                result.facts(),
+                result.classifiedFacts(),
+                result.dataFlows()
         );
 
         printApiFlows(
-                scanResult.facts(),
-                classifiedFacts,
-                edges
+                result.facts(),
+                result.classifiedFacts(),
+                result.dataFlows()
         );
 
         printFindings(
-                findings
+                result.findings()
         );
 
         return 0;
@@ -226,12 +139,12 @@ public class ScanCommand implements Callable<Integer> {
 
     private void printSummary(
             Path projectPath,
-            ScanResult scanResult,
-            List<ClassifiedFact> classifiedFacts
+            AnalysisResult result
     ) {
 
         System.out.println();
         System.out.println("PrivacyOps 0.1.0");
+
         System.out.println();
         System.out.println(
                 "Project: "
@@ -247,24 +160,28 @@ public class ScanCommand implements Callable<Integer> {
         System.out.printf(
                 "%-22s : %d%n",
                 "Facts",
-                scanResult.facts().size()
+                result.facts().size()
         );
 
         System.out.printf(
                 "%-22s : %d%n",
                 "Privacy Candidates",
-                classifiedFacts.size()
+                result.classifiedFacts().size()
         );
 
         System.out.printf(
                 "%-22s : %d%n",
                 "Warnings",
-                scanResult.warnings().size()
+                result.warnings().size()
         );
 
-        printPrivacyTypes(classifiedFacts);
+        printPrivacyTypes(
+                result.classifiedFacts()
+        );
 
-        printWarnings(scanResult);
+        printWarnings(
+                result.warnings()
+        );
     }
 
     private void printPrivacyTypes(
@@ -301,10 +218,10 @@ public class ScanCommand implements Callable<Integer> {
     }
 
     private void printWarnings(
-            ScanResult scanResult
+            List<String> warnings
     ) {
 
-        if (scanResult.warnings().isEmpty()) {
+        if (warnings.isEmpty()) {
             return;
         }
 
@@ -314,13 +231,12 @@ public class ScanCommand implements Callable<Integer> {
                 "--------------------------------"
         );
 
-        scanResult.warnings()
-                .forEach(
-                        warning ->
-                                System.out.println(
-                                        "- " + warning
-                                )
-                );
+        warnings.forEach(
+                warning ->
+                        System.out.println(
+                                "- " + warning
+                        )
+        );
     }
 
 
@@ -451,11 +367,21 @@ public class ScanCommand implements Callable<Integer> {
 
             if (finding.location() != null) {
 
-                System.out.printf(
-                        "Location: %s:%s%n",
-                        finding.location().file(),
-                        finding.location().line()
-                );
+                if (finding.location().line() != null) {
+
+                    System.out.printf(
+                            "Location: %s:%d%n",
+                            finding.location().file(),
+                            finding.location().line()
+                    );
+
+                } else {
+
+                    System.out.printf(
+                            "Location: %s%n",
+                            finding.location().file()
+                    );
+                }
             }
 
             System.out.println();

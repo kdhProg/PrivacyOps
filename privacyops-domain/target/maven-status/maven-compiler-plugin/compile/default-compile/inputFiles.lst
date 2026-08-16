@@ -1,4 +1,5 @@
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\classifier\PrivacyClassifier.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\engine\PrivacyOpsEngine.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\fact\ApiEndpointFact.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\fact\DatabaseColumnFact.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\fact\Fact.java
@@ -8,6 +9,7 @@ D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domai
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\flow\DataFlowEdge.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\flow\DataFlowLinker.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\flow\DataFlowRelation.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\model\AnalysisResult.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\model\Classification.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\model\ClassifiedFact.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\model\Finding.java
