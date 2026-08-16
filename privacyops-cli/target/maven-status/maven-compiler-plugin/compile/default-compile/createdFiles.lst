@@ -1,0 +1,3 @@
+io\github\privacyops\cli\PrivacyOpsApplication.class
+io\github\privacyops\cli\PrivacyOpsCommand.class
+io\github\privacyops\cli\ScanCommand.class

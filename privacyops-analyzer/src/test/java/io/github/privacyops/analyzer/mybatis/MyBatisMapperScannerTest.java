@@ -1,6 +1,7 @@
 package io.github.privacyops.analyzer.mybatis;
 
 import io.github.privacyops.fact.Fact;
+import io.github.privacyops.fact.MapperColumnFact;
 import io.github.privacyops.fact.MapperQueryFact;
 
 import org.junit.jupiter.api.Test;
@@ -36,13 +37,18 @@ class MyBatisMapperScannerTest {
         List<Fact> facts =
                 scanner.scan(path);
 
-        assertEquals(
-                1,
-                facts.size()
-        );
-
         MapperQueryFact fact =
-                (MapperQueryFact) facts.get(0);
+                facts.stream()
+                        .filter(
+                                MapperQueryFact.class
+                                        ::isInstance
+                        )
+                        .map(
+                                MapperQueryFact.class
+                                        ::cast
+                        )
+                        .findFirst()
+                        .orElseThrow();
 
         assertEquals(
                 "samples.MemberMapper.selectMember",
@@ -60,15 +66,53 @@ class MyBatisMapperScannerTest {
         );
 
         assertTrue(
-                fact.columns().contains("RRN")
+                fact.columns()
+                        .contains("RRN")
         );
 
         assertTrue(
-                fact.columns().contains("EMAIL_ADDR")
+                fact.columns()
+                        .contains("EMAIL_ADDR")
         );
 
         assertTrue(
-                fact.columns().contains("PHONE_NO")
+                fact.columns()
+                        .contains("PHONE_NO")
+        );
+
+        List<MapperColumnFact> columns =
+                facts.stream()
+                        .filter(
+                                MapperColumnFact.class
+                                        ::isInstance
+                        )
+                        .map(
+                                MapperColumnFact.class
+                                        ::cast
+                        )
+                        .toList();
+
+        assertEquals(
+                5,
+                columns.size()
+        );
+
+        assertTrue(
+                columns.stream()
+                        .anyMatch(
+                                column ->
+                                        column.columnName()
+                                                .equals("RRN")
+                        )
+        );
+
+        assertTrue(
+                columns.stream()
+                        .anyMatch(
+                                column ->
+                                        column.tableName()
+                                                .equals("TB_MEMBER")
+                        )
         );
     }
 

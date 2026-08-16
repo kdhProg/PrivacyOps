@@ -1,6 +1,7 @@
 package io.github.privacyops.analyzer.mybatis;
 
 import io.github.privacyops.fact.Fact;
+import io.github.privacyops.fact.MapperColumnFact;
 import io.github.privacyops.fact.MapperQueryFact;
 import io.github.privacyops.model.SourceLocation;
 import io.github.privacyops.scan.ArtifactScanner;
@@ -119,7 +120,12 @@ public class MyBatisMapperScanner
                         );
 
                 if (fact != null) {
+
                     facts.add(fact);
+
+                    facts.addAll(
+                            createColumnFacts(fact)
+                    );
                 }
             }
 
@@ -299,5 +305,46 @@ public class MyBatisMapperScanner
         return sql
                 .replaceAll("\\s+", " ")
                 .trim();
+    }
+
+    private List<Fact> createColumnFacts(
+            MapperQueryFact query
+    ) {
+
+        if (query.tables().isEmpty()
+                || query.columns().isEmpty()) {
+
+            return List.of();
+        }
+
+        // 현재 MVP는 단일 테이블 SELECT만 지원
+        String tableName =
+                query.tables().get(0);
+
+        List<Fact> facts =
+                new ArrayList<>();
+
+        for (String column :
+                query.columns()) {
+
+            String id =
+                    "mybatis-column:"
+                            + query.mapperId()
+                            + "#"
+                            + column;
+
+            facts.add(
+                    new MapperColumnFact(
+                            id,
+                            query.mapperId(),
+                            tableName,
+                            column,
+                            query.resultType(),
+                            query.location()
+                    )
+            );
+        }
+
+        return facts;
     }
 }

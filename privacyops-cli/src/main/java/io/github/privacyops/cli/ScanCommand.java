@@ -2,12 +2,15 @@ package io.github.privacyops.cli;
 
 import io.github.privacyops.analyzer.PrivacyAnalysisService;
 import io.github.privacyops.analyzer.classifier.NamePatternPrivacyClassifier;
+import io.github.privacyops.analyzer.flow.MapperResultFlowLinker;
 import io.github.privacyops.analyzer.java.JavaSourceScanner;
 import io.github.privacyops.analyzer.mybatis.MyBatisMapperScanner;
 import io.github.privacyops.analyzer.project.DefaultProjectScanner;
 
 import io.github.privacyops.analyzer.spring.SpringControllerScanner;
+import io.github.privacyops.fact.MapperColumnFact;
 import io.github.privacyops.fact.MapperQueryFact;
+import io.github.privacyops.flow.DataFlowRelation;
 import io.github.privacyops.model.ClassifiedFact;
 import io.github.privacyops.model.PrivacyType;
 import io.github.privacyops.scan.ScanResult;
@@ -33,6 +36,8 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.ArrayList;
+
 
 @Command(
         name = "scan",
@@ -88,13 +93,26 @@ public class ScanCommand implements Callable<Integer> {
                 );
 
 // 1. 데이터 흐름 연결
-        ControllerResponseFlowLinker flowLinker =
+        List<DataFlowEdge> edges =
+                new ArrayList<>();
+
+        MapperResultFlowLinker mapperFlowLinker =
+                new MapperResultFlowLinker();
+
+        edges.addAll(
+                mapperFlowLinker.link(
+                        scanResult.facts()
+                )
+        );
+
+        ControllerResponseFlowLinker apiFlowLinker =
                 new ControllerResponseFlowLinker();
 
-        List<DataFlowEdge> edges =
-                flowLinker.link(
+        edges.addAll(
+                apiFlowLinker.link(
                         scanResult.facts()
-                );
+                )
+        );
 
 // 2. Rule 평가용 Context 생성
         RuleContext ruleContext =
@@ -129,6 +147,12 @@ public class ScanCommand implements Callable<Integer> {
 
         printMapperQueries(
                 scanResult.facts()
+        );
+
+        printMapperFlows(
+                scanResult.facts(),
+                classifiedFacts,
+                edges
         );
 
         printApiFlows(
@@ -426,6 +450,107 @@ public class ScanCommand implements Callable<Integer> {
             System.out.println(
                     "  columns    : "
                             + query.columns()
+            );
+        }
+    }
+
+    private void printMapperFlows(
+            List<io.github.privacyops.fact.Fact> facts,
+            List<ClassifiedFact> classifiedFacts,
+            List<DataFlowEdge> edges
+    ) {
+
+        System.out.println();
+        System.out.println("Mapper Privacy Flows");
+        System.out.println(
+                "--------------------------------"
+        );
+
+        for (DataFlowEdge edge : edges) {
+
+            if (edge.relation()
+                    != DataFlowRelation.MAPPER_RESULT) {
+
+                continue;
+            }
+
+            MapperColumnFact column =
+                    facts.stream()
+                            .filter(
+                                    fact ->
+                                            fact.id()
+                                                    .equals(
+                                                            edge.sourceFactId()
+                                                    )
+                            )
+                            .filter(
+                                    MapperColumnFact.class
+                                            ::isInstance
+                            )
+                            .map(
+                                    MapperColumnFact.class
+                                            ::cast
+                            )
+                            .findFirst()
+                            .orElse(null);
+
+            JavaFieldFact field =
+                    facts.stream()
+                            .filter(
+                                    fact ->
+                                            fact.id()
+                                                    .equals(
+                                                            edge.targetFactId()
+                                                    )
+                            )
+                            .filter(
+                                    JavaFieldFact.class
+                                            ::isInstance
+                            )
+                            .map(
+                                    JavaFieldFact.class
+                                            ::cast
+                            )
+                            .findFirst()
+                            .orElse(null);
+
+            if (column == null
+                    || field == null) {
+
+                continue;
+            }
+
+            ClassifiedFact classified =
+                    classifiedFacts.stream()
+                            .filter(
+                                    item ->
+                                            item.fact()
+                                                    .id()
+                                                    .equals(
+                                                            field.id()
+                                                    )
+                            )
+                            .findFirst()
+                            .orElse(null);
+
+            // 일반 비개인정보 컬럼은 CLI Privacy Flow에서 생략
+            if (classified == null) {
+                continue;
+            }
+
+            System.out.printf(
+                    "%s.%s%n",
+                    column.tableName(),
+                    column.columnName()
+            );
+
+            System.out.printf(
+                    "  -> %s.%s [%s]%n",
+                    field.className(),
+                    field.fieldName(),
+                    classified
+                            .classification()
+                            .privacyType()
             );
         }
     }
