@@ -3,9 +3,11 @@ package io.github.privacyops.cli;
 import io.github.privacyops.analyzer.PrivacyAnalysisService;
 import io.github.privacyops.analyzer.classifier.NamePatternPrivacyClassifier;
 import io.github.privacyops.analyzer.java.JavaSourceScanner;
+import io.github.privacyops.analyzer.mybatis.MyBatisMapperScanner;
 import io.github.privacyops.analyzer.project.DefaultProjectScanner;
 
 import io.github.privacyops.analyzer.spring.SpringControllerScanner;
+import io.github.privacyops.fact.MapperQueryFact;
 import io.github.privacyops.model.ClassifiedFact;
 import io.github.privacyops.model.PrivacyType;
 import io.github.privacyops.scan.ScanResult;
@@ -64,7 +66,8 @@ public class ScanCommand implements Callable<Integer> {
                 new DefaultProjectScanner(
                         List.of(
                                 new JavaSourceScanner(),
-                                new SpringControllerScanner()
+                                new SpringControllerScanner(),
+                                new MyBatisMapperScanner()
                         )
                 );
 
@@ -122,6 +125,10 @@ public class ScanCommand implements Callable<Integer> {
                 projectPath,
                 scanResult,
                 classifiedFacts
+        );
+
+        printMapperQueries(
+                scanResult.facts()
         );
 
         printApiFlows(
@@ -370,6 +377,56 @@ public class ScanCommand implements Callable<Integer> {
             }
 
             System.out.println();
+        }
+    }
+
+    private void printMapperQueries(
+            List<io.github.privacyops.fact.Fact> facts
+    ) {
+
+        List<MapperQueryFact> queries =
+                facts.stream()
+                        .filter(
+                                MapperQueryFact.class
+                                        ::isInstance
+                        )
+                        .map(
+                                MapperQueryFact.class
+                                        ::cast
+                        )
+                        .toList();
+
+        if (queries.isEmpty()) {
+            return;
+        }
+
+        System.out.println();
+        System.out.println("MyBatis Queries");
+        System.out.println(
+                "--------------------------------"
+        );
+
+        for (MapperQueryFact query :
+                queries) {
+
+            System.out.println(
+                    query.mapperId()
+            );
+
+            System.out.println(
+                    "  resultType : "
+                            + query.resultType()
+            );
+
+            System.out.println(
+                    "  tables     : "
+                            + query.tables()
+            );
+
+            System.out.println(
+                    "  columns    : "
+                            + query.columns()
+            );
         }
     }
 

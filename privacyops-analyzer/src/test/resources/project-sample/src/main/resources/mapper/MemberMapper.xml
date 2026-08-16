@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mapper namespace="samples.MemberMapper">
+
+    <select id="selectMember"
+            resultType="samples.MemberDto">
+
+        SELECT
+        MEMBER_ID,
+        NAME,
+        RRN,
+        EMAIL_ADDR,
+        PHONE_NO
+        FROM TB_MEMBER
+
+    </select>
+
+</mapper>
