@@ -1,5 +1,6 @@
 io\github\privacyops\model\PrivacyType.class
 io\github\privacyops\fact\ApiEndpointFact.class
+io\github\privacyops\fact\ApiAccessControlFact.class
 io\github\privacyops\scan\ArtifactScanner.class
 io\github\privacyops\rule\RuleContext.class
 io\github\privacyops\flow\DataFlowEdge.class

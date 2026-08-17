@@ -8,6 +8,7 @@ io\github\privacyops\analyzer\project\DefaultProjectScanner.class
 io\github\privacyops\analyzer\policy\YamlPolicyProvider.class
 io\github\privacyops\analyzer\rule\MissingResourcePolicyRule.class
 org\example\Main.class
+io\github\privacyops\analyzer\rule\MissingAccessControlRule.class
 io\github\privacyops\analyzer\engine\PrivacyOpsEngineFactory.class
 io\github\privacyops\analyzer\PrivacyAnalysisService.class
 io\github\privacyops\analyzer\rule\ApiPrivacyExposureRule$1.class

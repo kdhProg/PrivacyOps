@@ -1,5 +1,6 @@
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\classifier\PrivacyClassifier.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\engine\PrivacyOpsEngine.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\fact\ApiAccessControlFact.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\fact\ApiEndpointFact.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\fact\DatabaseColumnFact.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\fact\Fact.java
