@@ -12,6 +12,9 @@ public class MemberController {
     @PreAuthorize(
             "hasRole('PRIVACY_HANDLER')"
     )
+    @PrivacyAudit(
+            "PERSONAL_INFO_VIEW"
+    )
     @GetMapping("/{id}")
     public MemberDto getMember() {
         return null;

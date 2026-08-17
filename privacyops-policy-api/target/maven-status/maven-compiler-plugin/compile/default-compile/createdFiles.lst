@@ -1,2 +1,3 @@
 org\example\Main.class
+io\github\privacyops\api\PrivacyAudit.class
 io\github\privacyops\api\PrivacyData.class

@@ -1,15 +1,16 @@
 package io.github.privacyops.analyzer.spring;
 
 import io.github.privacyops.fact.ApiAccessControlFact;
+import io.github.privacyops.fact.ApiAuditControlFact;
 import io.github.privacyops.fact.ApiEndpointFact;
 import io.github.privacyops.fact.Fact;
-
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SpringControllerScannerTest {
 
@@ -119,5 +120,48 @@ class SpringControllerScannerTest {
                                 "PRIVACY_HANDLER"
                         )
         );
+    }
+
+    @Test
+    void extractsPrivacyAuditAnnotation()
+            throws Exception {
+
+        Path path =
+                Path.of(
+                        getClass()
+                                .getClassLoader()
+                                .getResource(
+                                        "spring/"
+                                                + "AuditedMemberController.java"
+                                )
+                                .toURI()
+                );
+
+        List<Fact> facts =
+                scanner.scan(path);
+
+        ApiAuditControlFact audit =
+                facts.stream()
+                        .filter(
+                                ApiAuditControlFact.class
+                                        ::isInstance
+                        )
+                        .map(
+                                ApiAuditControlFact.class
+                                        ::cast
+                        )
+                        .findFirst()
+                        .orElseThrow();
+
+        assertEquals(
+                "PERSONAL_INFO_VIEW",
+                audit.auditEvent()
+        );
+
+        assertEquals(
+                "PrivacyAudit",
+                audit.sourceType()
+        );
+
     }
 }

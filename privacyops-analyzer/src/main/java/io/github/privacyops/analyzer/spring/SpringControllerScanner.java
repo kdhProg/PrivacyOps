@@ -7,6 +7,7 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.*;
 
 import io.github.privacyops.fact.ApiAccessControlFact;
+import io.github.privacyops.fact.ApiAuditControlFact;
 import io.github.privacyops.fact.ApiEndpointFact;
 import io.github.privacyops.fact.Fact;
 import io.github.privacyops.model.SourceLocation;
@@ -148,6 +149,13 @@ public class SpringControllerScanner implements ArtifactScanner {
             facts.add(fact);
 
             extractAccessControl(
+                    method,
+                    fact
+            ).ifPresent(
+                    facts::add
+            );
+
+            extractAuditControl(
                     method,
                     fact
             ).ifPresent(
@@ -357,5 +365,74 @@ public class SpringControllerScanner implements ArtifactScanner {
         }
 
         return "";
+    }
+
+    private Optional<ApiAuditControlFact>
+    extractAuditControl(
+            MethodDeclaration method,
+            ApiEndpointFact endpoint
+    ) {
+
+        for (AnnotationExpr annotation :
+                method.getAnnotations()) {
+
+            String annotationName =
+                    annotation
+                            .getName()
+                            .getIdentifier();
+
+            if (!annotationName.equals(
+                    "PrivacyAudit"
+            )) {
+                continue;
+            }
+
+            String auditEvent =
+                    extractAnnotationValue(
+                            annotation
+                    );
+
+            auditEvent =
+                    stripQuotes(
+                            auditEvent
+                    );
+
+            return Optional.of(
+                    new ApiAuditControlFact(
+                            "audit:"
+                                    + endpoint.id(),
+                            endpoint.id(),
+                            auditEvent,
+                            "PrivacyAudit",
+                            endpoint.location()
+                    )
+            );
+        }
+
+        return Optional.empty();
+    }
+
+    private String stripQuotes(
+            String value
+    ) {
+
+        if (value == null) {
+            return "";
+        }
+
+        String result =
+                value.trim();
+
+        if (result.length() >= 2
+                && result.startsWith("\"")
+                && result.endsWith("\"")) {
+
+            return result.substring(
+                    1,
+                    result.length() - 1
+            );
+        }
+
+        return result;
     }
 }

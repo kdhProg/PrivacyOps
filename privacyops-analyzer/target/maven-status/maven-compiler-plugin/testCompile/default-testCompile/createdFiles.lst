@@ -5,6 +5,7 @@ io\github\privacyops\analyzer\flow\ControllerResponseFlowLinkerTest.class
 io\github\privacyops\analyzer\rule\MissingAccessControlRuleTest.class
 io\github\privacyops\analyzer\policy\YamlPolicyProviderTest.class
 io\github\privacyops\analyzer\project\DefaultProjectScannerTest.class
+io\github\privacyops\analyzer\rule\MissingAuditControlRuleTest.class
 io\github\privacyops\analyzer\rule\ApiPrivacyExposureRuleTest.class
 io\github\privacyops\analyzer\engine\DefaultPrivacyOpsEngineTest.class
 io\github\privacyops\analyzer\mybatis\MyBatisMapperScannerTest.class

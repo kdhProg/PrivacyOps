@@ -46,6 +46,7 @@ public final class PrivacyOpsEngineFactory {
                 List.of(
                         new ApiPrivacyExposureRule(),
                         new MissingAccessControlRule(),
+                        new MissingAuditControlRule(),
                         new MissingResourcePolicyRule(),
                         new MissingRetentionPolicyRule(),
                         new MissingDisposalPolicyRule()

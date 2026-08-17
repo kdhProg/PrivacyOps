@@ -10,6 +10,7 @@ D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analy
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\project\DefaultProjectScanner.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\ApiPrivacyExposureRule.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\MissingAccessControlRule.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\MissingAuditControlRule.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\MissingDisposalPolicyRule.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\MissingResourcePolicyRule.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\MissingRetentionPolicyRule.java
