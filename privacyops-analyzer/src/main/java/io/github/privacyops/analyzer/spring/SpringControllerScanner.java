@@ -4,10 +4,9 @@ import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.expr.AnnotationExpr;
-import com.github.javaparser.ast.expr.SingleMemberAnnotationExpr;
-import com.github.javaparser.ast.expr.StringLiteralExpr;
+import com.github.javaparser.ast.expr.*;
 
+import io.github.privacyops.fact.ApiAccessControlFact;
 import io.github.privacyops.fact.ApiEndpointFact;
 import io.github.privacyops.fact.Fact;
 import io.github.privacyops.model.SourceLocation;
@@ -147,6 +146,14 @@ public class SpringControllerScanner implements ArtifactScanner {
                     );
 
             facts.add(fact);
+
+            extractAccessControl(
+                    method,
+                    fact
+            ).ifPresent(
+                    facts::add
+            );
+
         }
     }
 
@@ -268,5 +275,87 @@ public class SpringControllerScanner implements ArtifactScanner {
             String httpMethod,
             String path
     ) {
+    }
+
+    private Optional<ApiAccessControlFact>
+    extractAccessControl(
+            MethodDeclaration method,
+            ApiEndpointFact endpoint
+    ) {
+
+        for (AnnotationExpr annotation :
+                method.getAnnotations()) {
+
+            String annotationName =
+                    annotation
+                            .getName()
+                            .getIdentifier();
+
+            if (!isAccessControlAnnotation(
+                    annotationName
+            )) {
+                continue;
+            }
+
+            String expression =
+                    extractAnnotationValue(
+                            annotation
+                    );
+
+            return Optional.of(
+                    new ApiAccessControlFact(
+                            "access:"
+                                    + endpoint.id(),
+                            endpoint.id(),
+                            annotationName,
+                            expression,
+                            endpoint.location()
+                    )
+            );
+        }
+
+        return Optional.empty();
+    }
+
+    private boolean isAccessControlAnnotation(
+            String annotationName
+    ) {
+
+        return annotationName.equals(
+                "PreAuthorize"
+        )
+                || annotationName.equals(
+                "Secured"
+        )
+                || annotationName.equals(
+                "RolesAllowed"
+        );
+    }
+
+    private String extractAnnotationValue(
+            AnnotationExpr annotation
+    ) {
+
+        if (annotation
+                instanceof SingleMemberAnnotationExpr singleMember) {
+
+            return singleMember
+                    .getMemberValue()
+                    .toString();
+        }
+
+        if (annotation
+                instanceof NormalAnnotationExpr normal) {
+
+            return normal
+                    .getPairs()
+                    .stream()
+                    .findFirst()
+                    .map(MemberValuePair::getValue)
+                    .map(Object::toString)
+                    .orElse("");
+        }
+
+        return "";
     }
 }

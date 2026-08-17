@@ -1,5 +1,6 @@
 package io.github.privacyops.analyzer.spring;
 
+import io.github.privacyops.fact.ApiAccessControlFact;
 import io.github.privacyops.fact.ApiEndpointFact;
 import io.github.privacyops.fact.Fact;
 
@@ -35,13 +36,25 @@ class SpringControllerScannerTest {
         List<Fact> facts =
                 scanner.scan(path);
 
-        assertEquals(
-                1,
-                facts.size()
-        );
-
+//        assertEquals(
+//                1,
+//                facts.size()
+//        );
+//
+//        ApiEndpointFact endpoint =
+//                (ApiEndpointFact) facts.get(0);
         ApiEndpointFact endpoint =
-                (ApiEndpointFact) facts.get(0);
+                facts.stream()
+                        .filter(
+                                ApiEndpointFact.class
+                                        ::isInstance
+                        )
+                        .map(
+                                ApiEndpointFact.class
+                                        ::cast
+                        )
+                        .findFirst()
+                        .orElseThrow();
 
         assertEquals(
                 "GET",
@@ -61,6 +74,50 @@ class SpringControllerScannerTest {
         assertEquals(
                 "getMember",
                 endpoint.controllerMethod()
+        );
+    }
+
+    @Test
+    void extractsAccessControlAnnotation()
+            throws Exception {
+
+        Path path =
+                Path.of(
+                        getClass()
+                                .getClassLoader()
+                                .getResource(
+                                        "spring/"
+                                                + "SecuredMemberController.java"
+                                )
+                                .toURI()
+                );
+
+        List<Fact> facts =
+                scanner.scan(path);
+
+        ApiAccessControlFact access =
+                facts.stream()
+                        .filter(
+                                ApiAccessControlFact.class
+                                        ::isInstance
+                        )
+                        .map(
+                                ApiAccessControlFact.class
+                                        ::cast
+                        )
+                        .findFirst()
+                        .orElseThrow();
+
+        assertEquals(
+                "PreAuthorize",
+                access.annotationType()
+        );
+
+        assertTrue(
+                access.expression()
+                        .contains(
+                                "PRIVACY_HANDLER"
+                        )
         );
     }
 }
