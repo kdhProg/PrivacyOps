@@ -10,6 +10,7 @@
         <option value="$PROJECT_DIR$/privacyops-cli/pom.xml" />
         <option value="$PROJECT_DIR$/privacyops-policy-api/pom.xml" />
         <option value="$PROJECT_DIR$/privacyops-report/pom.xml" />
+        <option value="$PROJECT_DIR$/samples/java8-policy-consume/pom.xml" />
       </list>
     </option>
   </component>
