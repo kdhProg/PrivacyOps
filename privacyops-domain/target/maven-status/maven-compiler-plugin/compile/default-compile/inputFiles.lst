@@ -25,6 +25,7 @@ D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domai
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\rule\PrivacyRule.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\rule\RuleContext.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\scan\ArtifactScanner.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\scan\DatabaseScanner.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\scan\ProjectScanner.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\scan\ScanResult.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\org\example\Main.java

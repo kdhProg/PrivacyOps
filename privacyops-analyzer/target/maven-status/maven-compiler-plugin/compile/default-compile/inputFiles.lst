@@ -1,5 +1,6 @@
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\classifier\AnnotationPrivacyClassifier.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\classifier\NamePatternPrivacyClassifier.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\database\JdbcDatabaseScanner.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\engine\DefaultPrivacyOpsEngine.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\engine\PrivacyOpsEngineFactory.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\flow\ControllerResponseFlowLinker.java
