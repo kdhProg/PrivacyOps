@@ -11,4 +11,5 @@ public class MemberDto {
     private String emailAddress;
 
     private String phoneNumber;
+
 }

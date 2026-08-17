@@ -4,6 +4,7 @@ import io.github.privacyops.analyzer.classifier.NamePatternPrivacyClassifier;
 import io.github.privacyops.fact.Fact;
 import io.github.privacyops.fact.JavaFieldFact;
 
+import io.github.privacyops.fact.PrivacyDataAnnotationFact;
 import io.github.privacyops.model.Classification;
 import io.github.privacyops.model.PrivacyType;
 import org.junit.jupiter.api.Test;
@@ -125,6 +126,147 @@ class JavaSourceScannerTest {
                 scanner.supports(
                         Path.of("MemberMapper.xml")
                 )
+        );
+    }
+
+    @Test
+    void extractsPrivacyDataAnnotation()
+            throws Exception {
+
+        Path path =
+                Path.of(
+                        getClass()
+                                .getClassLoader()
+                                .getResource(
+                                        "java/AnnotatedPrivacyDto.java"
+                                )
+                                .toURI()
+                );
+
+        List<Fact> facts =
+                scanner.scan(path);
+
+        PrivacyDataAnnotationFact annotation =
+                facts.stream()
+                        .filter(
+                                PrivacyDataAnnotationFact.class
+                                        ::isInstance
+                        )
+                        .map(
+                                PrivacyDataAnnotationFact.class
+                                        ::cast
+                        )
+                        .findFirst()
+                        .orElseThrow();
+
+        assertEquals(
+                "NATIONAL_IDENTIFIER",
+                annotation.declaredType()
+        );
+
+        JavaFieldFact secretField =
+                facts.stream()
+                        .filter(
+                                JavaFieldFact.class
+                                        ::isInstance
+                        )
+                        .map(
+                                JavaFieldFact.class
+                                        ::cast
+                        )
+                        .filter(
+                                field ->
+                                        field.fieldName()
+                                                .equals(
+                                                        "secretValue"
+                                                )
+                        )
+                        .findFirst()
+                        .orElseThrow();
+
+        assertEquals(
+                secretField.id(),
+                annotation.fieldFactId()
+        );
+    }
+
+    @Test
+    void extractsAnnotatedPrivacyFieldFromProjectSample()
+            throws Exception {
+
+        Path path =
+                Path.of(
+                        getClass()
+                                .getClassLoader()
+                                .getResource(
+                                        "project-sample/"
+                                                + "src/main/java/"
+                                                + "com/example/"
+                                                + "MemberDto.java"
+                                )
+                                .toURI()
+                );
+
+        List<Fact> facts =
+                scanner.scan(path);
+
+        facts.forEach(
+                fact ->
+                        System.out.println(
+                                fact.getClass()
+                                        .getSimpleName()
+                                        + " -> "
+                                        + fact
+                        )
+        );
+
+        JavaFieldFact secretValue =
+                facts.stream()
+                        .filter(
+                                JavaFieldFact.class
+                                        ::isInstance
+                        )
+                        .map(
+                                JavaFieldFact.class
+                                        ::cast
+                        )
+                        .filter(
+                                field ->
+                                        "secretValue".equals(
+                                                field.fieldName()
+                                        )
+                        )
+                        .findFirst()
+                        .orElseThrow();
+
+        assertEquals(
+                "secretValue",
+                secretValue.fieldName()
+        );
+
+        PrivacyDataAnnotationFact annotation =
+                facts.stream()
+                        .filter(
+                                PrivacyDataAnnotationFact.class
+                                        ::isInstance
+                        )
+                        .map(
+                                PrivacyDataAnnotationFact.class
+                                        ::cast
+                        )
+                        .filter(
+                                fact ->
+                                        fact.fieldFactId()
+                                                .equals(
+                                                        secretValue.id()
+                                                )
+                        )
+                        .findFirst()
+                        .orElseThrow();
+
+        assertEquals(
+                "NATIONAL_IDENTIFIER",
+                annotation.declaredType()
         );
     }
 
