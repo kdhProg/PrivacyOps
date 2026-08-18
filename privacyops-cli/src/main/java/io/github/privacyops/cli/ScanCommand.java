@@ -3,10 +3,7 @@ package io.github.privacyops.cli;
 import io.github.privacyops.analyzer.engine.PrivacyOpsEngineFactory;
 import io.github.privacyops.analyzer.policy.YamlPolicyProvider;
 import io.github.privacyops.engine.PrivacyOpsEngine;
-import io.github.privacyops.fact.ApiEndpointFact;
-import io.github.privacyops.fact.JavaFieldFact;
-import io.github.privacyops.fact.MapperColumnFact;
-import io.github.privacyops.fact.MapperQueryFact;
+import io.github.privacyops.fact.*;
 import io.github.privacyops.flow.DataFlowEdge;
 import io.github.privacyops.flow.DataFlowRelation;
 import io.github.privacyops.model.AnalysisResult;
@@ -23,6 +20,10 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import static picocli.CommandLine.Option;
 
@@ -53,6 +54,39 @@ public class ScanCommand implements Callable<Integer> {
     )
     private Path projectPath;
 
+    @Option(
+            names = "--db-url",
+            paramLabel = "<jdbc-url>",
+            description =
+                    "JDBC URL for database metadata scanning."
+    )
+    private String databaseUrl;
+
+    @Option(
+            names = "--db-user",
+            paramLabel = "<username>",
+            description =
+                    "Database username."
+    )
+    private String databaseUser;
+
+    @Option(
+            names = "--db-schema",
+            paramLabel = "<schema>",
+            description =
+                    "Database schema to scan."
+    )
+    private String databaseSchema;
+
+    @Option(
+            names = "--db-password-env",
+            paramLabel = "<env-name>",
+            description =
+                    "Environment variable containing "
+                            + "the database password."
+    )
+    private String databasePasswordEnvironment;
+
     @Override
     public Integer call() {
 
@@ -60,7 +94,8 @@ public class ScanCommand implements Callable<Integer> {
         if (!Files.isDirectory(projectPath)) {
 
             System.err.println(
-                    "Project path does not exist or is not a directory: "
+                    "Project path does not exist or "
+                            + "is not a directory: "
                             + projectPath
             );
 
@@ -92,21 +127,87 @@ public class ScanCommand implements Callable<Integer> {
                     );
         }
 
-        // 3. PrivacyOps Engine 생성
+        // 3. DB 옵션 검증
+        if (hasAnyDatabaseOption()
+                && !hasAllDatabaseOptions()) {
+
+            System.err.println(
+                    "Database scan requires all of: "
+                            + "--db-url, "
+                            + "--db-user, "
+                            + "--db-schema, "
+                            + "--db-password-env"
+            );
+
+            return 2;
+        }
+
+        // 4. Engine 생성
         PrivacyOpsEngine engine =
                 PrivacyOpsEngineFactory
                         .createDefault();
 
-        // 4. 전체 분석 실행
-        AnalysisResult result =
-                engine.analyze(
-                        projectPath,
-                        privacyPolicy
+        AnalysisResult result;
+
+        // 5-A. DB 포함 분석
+        if (hasAllDatabaseOptions()) {
+
+            String databasePassword =
+                    resolveDatabasePassword();
+
+            if (databasePassword == null) {
+
+                System.err.println(
+                        "Database password environment "
+                                + "variable is not set: "
+                                + databasePasswordEnvironment
                 );
 
-        // 5. 결과 출력
+                return 2;
+            }
+
+            try (Connection connection =
+                         DriverManager.getConnection(
+                                 databaseUrl,
+                                 databaseUser,
+                                 databasePassword
+                         )) {
+
+                result =
+                        engine.analyze(
+                                projectPath,
+                                privacyPolicy,
+                                connection,
+                                databaseSchema
+                        );
+
+            } catch (SQLException e) {
+
+                System.err.println(
+                        "Failed to connect to database: "
+                                + e.getMessage()
+                );
+
+                return 3;
+            }
+
+        } else {
+
+            // 5-B. 기존 Source-only 분석
+            result =
+                    engine.analyze(
+                            projectPath,
+                            privacyPolicy
+                    );
+        }
+
+        // 6. 결과 출력
         printSummary(
                 projectPath,
+                result
+        );
+
+        printDatabaseStatus(
                 result
         );
 
@@ -116,6 +217,10 @@ public class ScanCommand implements Callable<Integer> {
 
         printMapperQueries(
                 result.facts()
+        );
+
+        printDatabaseFlows(
+                result
         );
 
         printMapperFlows(
@@ -599,6 +704,224 @@ public class ScanCommand implements Callable<Integer> {
         }
 
         return value;
+    }
+
+    private boolean hasAnyDatabaseOption() {
+
+        return !isBlank(databaseUrl)
+                || !isBlank(databaseUser)
+                || !isBlank(databaseSchema)
+                || !isBlank(
+                databasePasswordEnvironment
+        );
+    }
+
+    private boolean hasAllDatabaseOptions() {
+
+        return !isBlank(databaseUrl)
+                && !isBlank(databaseUser)
+                && !isBlank(databaseSchema)
+                && !isBlank(
+                databasePasswordEnvironment
+        );
+    }
+
+    private boolean isBlank(
+            String value
+    ) {
+
+        return value == null
+                || value.isBlank();
+    }
+
+//    private String resolveDatabasePassword() {
+//
+//        if (isBlank(
+//                databasePasswordEnvironment
+//        )) {
+//
+//            return null;
+//        }
+//
+//        return System.getenv(
+//                databasePasswordEnvironment
+//        );
+//    }
+
+    protected String resolveDatabasePassword() {
+
+        if (isBlank(
+                databasePasswordEnvironment
+        )) {
+            return null;
+        }
+
+        return System.getenv(
+                databasePasswordEnvironment
+        );
+    }
+
+    private void printDatabaseStatus(
+            AnalysisResult result
+    ) {
+
+        List<DatabaseColumnFact> columns =
+                result.facts()
+                        .stream()
+                        .filter(
+                                DatabaseColumnFact.class
+                                        ::isInstance
+                        )
+                        .map(
+                                DatabaseColumnFact.class
+                                        ::cast
+                        )
+                        .toList();
+
+        if (columns.isEmpty()) {
+            return;
+        }
+
+        System.out.println();
+        System.out.println("Database Metadata");
+        System.out.println(
+                "--------------------------------"
+        );
+
+        System.out.println(
+                "Columns scanned : "
+                        + columns.size()
+        );
+
+        columns.stream()
+                .map(
+                        column ->
+                                column.schemaName()
+                                        + "."
+                                        + column.tableName()
+                )
+                .distinct()
+                .forEach(
+                        table ->
+                                System.out.println(
+                                        "  " + table
+                                )
+                );
+    }
+
+    private void printDatabaseFlows(
+            AnalysisResult result
+    ) {
+
+        List<DataFlowEdge> databaseEdges =
+                result.dataFlows()
+                        .stream()
+                        .filter(
+                                edge ->
+                                        edge.relation()
+                                                == DataFlowRelation
+                                                .DATABASE_MAPPER
+                        )
+                        .toList();
+
+        if (databaseEdges.isEmpty()) {
+            return;
+        }
+
+        System.out.println();
+        System.out.println("Database Privacy Flows");
+        System.out.println(
+                "--------------------------------"
+        );
+
+        for (DataFlowEdge edge :
+                databaseEdges) {
+
+            DatabaseColumnFact databaseColumn =
+                    result.facts()
+                            .stream()
+                            .filter(
+                                    fact ->
+                                            fact.id()
+                                                    .equals(
+                                                            edge.sourceFactId()
+                                                    )
+                            )
+                            .filter(
+                                    DatabaseColumnFact.class
+                                            ::isInstance
+                            )
+                            .map(
+                                    DatabaseColumnFact.class
+                                            ::cast
+                            )
+                            .findFirst()
+                            .orElse(null);
+
+            MapperColumnFact mapperColumn =
+                    result.facts()
+                            .stream()
+                            .filter(
+                                    fact ->
+                                            fact.id()
+                                                    .equals(
+                                                            edge.targetFactId()
+                                                    )
+                            )
+                            .filter(
+                                    MapperColumnFact.class
+                                            ::isInstance
+                            )
+                            .map(
+                                    MapperColumnFact.class
+                                            ::cast
+                            )
+                            .findFirst()
+                            .orElse(null);
+
+            if (databaseColumn == null
+                    || mapperColumn == null) {
+                continue;
+            }
+
+            ClassifiedFact classification =
+                    result.classifiedFacts()
+                            .stream()
+                            .filter(
+                                    classified ->
+                                            classified.fact()
+                                                    .id()
+                                                    .equals(
+                                                            databaseColumn.id()
+                                                    )
+                            )
+                            .findFirst()
+                            .orElse(null);
+
+            /*
+             * CLI의 Privacy Flow 화면에서는
+             * 개인정보로 분류되지 않은 DB 컬럼은 생략
+             */
+            if (classification == null) {
+                continue;
+            }
+
+            System.out.printf(
+                    "%s.%s.%s [%s]%n",
+                    databaseColumn.schemaName(),
+                    databaseColumn.tableName(),
+                    databaseColumn.columnName(),
+                    classification
+                            .classification()
+                            .privacyType()
+            );
+
+            System.out.printf(
+                    "  -> %s.%s%n",
+                    mapperColumn.tableName(),
+                    mapperColumn.columnName()
+            );
+        }
     }
 
 }

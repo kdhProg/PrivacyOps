@@ -23,4 +23,26 @@ class PrivacyOpsCommandTest {
                 exitCode
         );
     }
+
+    @Test
+    void rejectsIncompleteDatabaseOptions() {
+
+        CommandLine commandLine =
+                new CommandLine(
+                        new PrivacyOpsCommand()
+                );
+
+        int exitCode =
+                commandLine.execute(
+                        "scan",
+                        ".",
+                        "--db-url",
+                        "jdbc:h2:mem:test"
+                );
+
+        assertEquals(
+                2,
+                exitCode
+        );
+    }
 }
