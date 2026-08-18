@@ -4,11 +4,19 @@ import io.github.privacyops.model.AnalysisResult;
 import io.github.privacyops.policy.PrivacyPolicy;
 
 import java.nio.file.Path;
+import java.sql.Connection;
 
 public interface PrivacyOpsEngine {
 
     AnalysisResult analyze(
             Path projectRoot,
             PrivacyPolicy policy
+    );
+
+    AnalysisResult analyze(
+            Path projectRoot,
+            PrivacyPolicy policy,
+            Connection databaseConnection,
+            String databaseSchema
     );
 }

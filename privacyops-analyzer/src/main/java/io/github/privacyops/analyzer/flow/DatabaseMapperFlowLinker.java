@@ -4,14 +4,16 @@ import io.github.privacyops.fact.DatabaseColumnFact;
 import io.github.privacyops.fact.Fact;
 import io.github.privacyops.fact.MapperColumnFact;
 import io.github.privacyops.flow.DataFlowEdge;
+import io.github.privacyops.flow.DataFlowLinker;
 import io.github.privacyops.flow.DataFlowRelation;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class DatabaseMapperFlowLinker {
+public class DatabaseMapperFlowLinker implements DataFlowLinker {
 
+    @Override
     public List<DataFlowEdge> link(
             List<Fact> facts
     ) {
