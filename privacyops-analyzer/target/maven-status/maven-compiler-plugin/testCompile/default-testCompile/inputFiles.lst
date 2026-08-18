@@ -2,6 +2,7 @@ D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analy
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\database\JdbcDatabaseScannerTest.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\engine\DefaultPrivacyOpsEngineTest.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\flow\ControllerResponseFlowLinkerTest.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\flow\DatabaseMapperFlowLinkerTest.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\flow\MapperResultFlowLinkerTest.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\java\JavaSourceScannerTest.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\test\java\io\github\privacyops\analyzer\mybatis\MyBatisMapperScannerTest.java

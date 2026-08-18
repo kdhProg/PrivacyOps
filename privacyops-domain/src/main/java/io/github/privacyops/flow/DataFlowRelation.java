@@ -4,5 +4,7 @@ public enum DataFlowRelation {
 
     MAPPER_RESULT,
 
-    API_RESPONSE
+    API_RESPONSE,
+
+    DATABASE_MAPPER
 }
