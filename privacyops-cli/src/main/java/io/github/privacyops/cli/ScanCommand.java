@@ -11,6 +11,7 @@ import io.github.privacyops.model.ClassifiedFact;
 import io.github.privacyops.model.Finding;
 import io.github.privacyops.model.PrivacyType;
 import io.github.privacyops.policy.PrivacyPolicy;
+import io.github.privacyops.report.html.HtmlReportWriter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -86,6 +87,14 @@ public class ScanCommand implements Callable<Integer> {
                             + "the database password."
     )
     private String databasePasswordEnvironment;
+
+    @Option(
+            names = "--report",
+            paramLabel = "<html-file>",
+            description =
+                    "Write analysis result as an HTML report."
+    )
+    private Path reportPath;
 
     @Override
     public Integer call() {
@@ -238,6 +247,27 @@ public class ScanCommand implements Callable<Integer> {
         printFindings(
                 result.findings()
         );
+
+        if (reportPath != null) {
+
+            HtmlReportWriter reportWriter =
+                    new HtmlReportWriter();
+
+            reportWriter.write(
+                    result,
+                    reportPath
+            );
+
+            System.out.println();
+            System.out.println(
+                    "HTML report written to:"
+            );
+
+            System.out.println(
+                    reportPath
+                            .toAbsolutePath()
+            );
+        }
 
         return 0;
     }
