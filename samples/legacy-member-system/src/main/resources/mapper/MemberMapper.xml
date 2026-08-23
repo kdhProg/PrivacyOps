@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<mapper namespace="com.example.legacy.MemberMapper">
+
+    <select id="selectMember"
+            resultType="com.example.legacy.dto.MemberDto">
+
+        SELECT
+        MEMBER_ID,
+        NAME,
+        RESIDENT_NUMBER,
+        EMAIL_ADDRESS,
+        PHONE_NUMBER,
+        ADDRESS,
+        DEPARTMENT_CODE
+        FROM TB_MEMBER
+        WHERE MEMBER_ID = #{memberId}
+
+    </select>
+
+</mapper>
