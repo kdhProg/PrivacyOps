@@ -7,6 +7,8 @@ import io.github.privacyops.model.Finding;
 import io.github.privacyops.model.PrivacyType;
 import io.github.privacyops.model.Severity;
 import io.github.privacyops.policy.ResourcePolicy;
+import io.github.privacyops.report.score.GovernanceScore;
+import io.github.privacyops.report.score.GovernanceScoreCalculator;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -67,6 +69,10 @@ public class HtmlReportWriter {
     private String createHtml(
             AnalysisResult result
     ) {
+
+        GovernanceScore governance =
+                new GovernanceScoreCalculator()
+                        .calculate(result);
 
         StringBuilder html =
                 new StringBuilder();
@@ -248,7 +254,13 @@ public class HtmlReportWriter {
         appendSummaryCards(
                 html,
                 result,
-                severityCounts
+                severityCounts,
+                governance
+        );
+
+        appendGovernanceCoverage(
+                html,
+                governance
         );
 
         appendPrivacyTypes(
@@ -289,7 +301,8 @@ public class HtmlReportWriter {
     private void appendSummaryCards(
             StringBuilder html,
             AnalysisResult result,
-            Map<Severity, Long> severityCounts
+            Map<Severity, Long> severityCounts,
+            GovernanceScore governance
     ) {
 
         html.append(
@@ -331,6 +344,13 @@ public class HtmlReportWriter {
                 )
         );
 
+        appendCard(
+                html,
+                "Governance Coverage",
+                governance.score()
+                        + " / 100"
+        );
+
         html.append(
                 """
                 </div>
@@ -364,6 +384,43 @@ public class HtmlReportWriter {
         );
 
         html.append(value);
+
+        html.append(
+                """
+                    </div>
+                </div>
+                """
+        );
+    }
+
+    private void appendCard(
+            StringBuilder html,
+            String label,
+            String value
+    ) {
+
+        html.append(
+                """
+                <div class="card">
+                    <div class="card-label">
+                """
+        );
+
+        html.append(
+                escape(label)
+        );
+
+        html.append(
+                """
+                    </div>
+    
+                    <div class="card-value">
+                """
+        );
+
+        html.append(
+                escape(value)
+        );
 
         html.append(
                 """
@@ -869,5 +926,107 @@ public class HtmlReportWriter {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
+    }
+
+    private void appendGovernanceCoverage(
+            StringBuilder html,
+            GovernanceScore score
+    ) {
+
+        html.append(
+                """
+                <div class="section">
+                    <h2 class="section-title">
+                        Governance Coverage
+                    </h2>
+    
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>Control</th>
+                            <th>Status</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                """
+        );
+
+        appendControlRow(
+                html,
+                "Resource Policy",
+                score.resourcePolicy()
+        );
+
+        appendControlRow(
+                html,
+                "Retention",
+                score.retention()
+        );
+
+        appendControlRow(
+                html,
+                "Disposal",
+                score.disposal()
+        );
+
+        appendControlRow(
+                html,
+                "Access Control",
+                score.accessControl()
+        );
+
+        appendControlRow(
+                html,
+                "Audit Control",
+                score.auditControl()
+        );
+
+        html.append(
+                """
+                        </tbody>
+                    </table>
+    
+                    <div class="subtitle">
+                        Coverage score indicates whether
+                        PrivacyOps-recognized governance controls
+                        are present. It is not a quantitative
+                        security-risk assessment.
+                    </div>
+                </div>
+                """
+        );
+    }
+
+    private void appendControlRow(
+            StringBuilder html,
+            String control,
+            boolean detected
+    ) {
+
+        html.append("<tr>");
+
+        html.append("<td>");
+        html.append(
+                escape(control)
+        );
+        html.append("</td>");
+
+        html.append("<td>");
+
+        if (detected) {
+
+            html.append(
+                    "<span class=\"badge\">DETECTED</span>"
+            );
+
+        } else {
+
+            html.append(
+                    "<span class=\"badge\">MISSING</span>"
+            );
+        }
+
+        html.append("</td>");
+        html.append("</tr>");
     }
 }
