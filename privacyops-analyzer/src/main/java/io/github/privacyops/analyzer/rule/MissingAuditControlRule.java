@@ -4,6 +4,8 @@ import io.github.privacyops.fact.ApiAuditControlFact;
 import io.github.privacyops.fact.ApiEndpointFact;
 import io.github.privacyops.flow.DataFlowEdge;
 import io.github.privacyops.flow.DataFlowRelation;
+import io.github.privacyops.model.Evidence;
+import io.github.privacyops.model.EvidenceType;
 import io.github.privacyops.model.Finding;
 import io.github.privacyops.model.Severity;
 import io.github.privacyops.rule.PrivacyRule;
@@ -127,6 +129,25 @@ public class MissingAuditControlRule
                 continue;
             }
 
+            List<Evidence> evidence =
+                    List.of(
+                            new Evidence(
+                                    EvidenceType.DATA_FLOW,
+                                    "Privacy API detected",
+                                    endpoint.httpMethod()
+                                            + " "
+                                            + endpoint.path(),
+                                    endpoint.location()
+                            ),
+                            new Evidence(
+                                    EvidenceType.SOURCE_CODE,
+                                    "Audit control",
+                                    "No recognized audit control "
+                                            + "was found for this endpoint.",
+                                    endpoint.location()
+                            )
+                    );
+
             findings.add(
                     new Finding(
                             id(),
@@ -138,7 +159,8 @@ public class MissingAuditControlRule
                                     + " has no recognized "
                                     + "audit control.",
                             defaultSeverity(),
-                            endpoint.location()
+                            endpoint.location(),
+                            evidence
                     )
             );
         }

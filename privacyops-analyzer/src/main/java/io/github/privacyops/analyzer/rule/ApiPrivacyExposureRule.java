@@ -7,10 +7,7 @@ import io.github.privacyops.fact.JavaFieldFact;
 import io.github.privacyops.flow.DataFlowEdge;
 import io.github.privacyops.flow.DataFlowRelation;
 
-import io.github.privacyops.model.ClassifiedFact;
-import io.github.privacyops.model.Finding;
-import io.github.privacyops.model.PrivacyType;
-import io.github.privacyops.model.Severity;
+import io.github.privacyops.model.*;
 
 import io.github.privacyops.rule.PrivacyRule;
 import io.github.privacyops.rule.RuleContext;
@@ -108,13 +105,53 @@ public class ApiPrivacyExposureRule
                             classifiedFact
                     );
 
+            /*
+             * Evidence 1:
+             * 개인정보로 분류된 Java 필드 자체
+             */
+            Evidence privacyFieldEvidence =
+                    new Evidence(
+                            EvidenceType.DATA_FLOW,
+                            "Privacy field detected",
+                            fieldFact.className()
+                                    + "."
+                                    + fieldFact.fieldName()
+                                    + " ["
+                                    + classifiedFact
+                                    .classification()
+                                    .privacyType()
+                                    + "]",
+                            fieldFact.location()
+                    );
+
+            /*
+             * Evidence 2:
+             * 해당 개인정보가 연결된 API Endpoint
+             */
+            Evidence apiEndpointEvidence =
+                    new Evidence(
+                            EvidenceType.SOURCE_CODE,
+                            "API endpoint",
+                            endpointFact.httpMethod()
+                                    + " "
+                                    + endpointFact.path(),
+                            endpointFact.location()
+                    );
+
+            /*
+             * Evidence가 포함된 Finding 생성
+             */
             findings.add(
                     new Finding(
                             id(),
                             name(),
                             description,
                             severity,
-                            endpointFact.location()
+                            endpointFact.location(),
+                            List.of(
+                                    privacyFieldEvidence,
+                                    apiEndpointEvidence
+                            )
                     )
             );
         }

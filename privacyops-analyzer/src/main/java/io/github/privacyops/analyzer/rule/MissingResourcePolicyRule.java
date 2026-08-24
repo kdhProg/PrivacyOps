@@ -1,19 +1,21 @@
 package io.github.privacyops.analyzer.rule;
 
-import io.github.privacyops.fact.Fact;
 import io.github.privacyops.fact.MapperColumnFact;
-
 import io.github.privacyops.flow.DataFlowEdge;
 import io.github.privacyops.flow.DataFlowRelation;
-
 import io.github.privacyops.model.ClassifiedFact;
+import io.github.privacyops.model.Evidence;
+import io.github.privacyops.model.EvidenceType;
 import io.github.privacyops.model.Finding;
 import io.github.privacyops.model.Severity;
-
 import io.github.privacyops.rule.PrivacyRule;
 import io.github.privacyops.rule.RuleContext;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public class MissingResourcePolicyRule
         implements PrivacyRule {
@@ -58,8 +60,7 @@ public class MissingResourcePolicyRule
             }
 
             // target DTO 필드가 개인정보인지 확인
-            Optional<ClassifiedFact>
-                    classifiedTarget =
+            Optional<ClassifiedFact> classifiedTarget =
                     context
                             .classifiedFacts()
                             .stream()
@@ -78,8 +79,7 @@ public class MissingResourcePolicyRule
             }
 
             // source가 MapperColumnFact인지 확인
-            Optional<MapperColumnFact>
-                    column =
+            Optional<MapperColumnFact> columnOptional =
                     context
                             .facts()
                             .stream()
@@ -100,16 +100,24 @@ public class MissingResourcePolicyRule
                             )
                             .findFirst();
 
-            if (column.isEmpty()) {
+            if (columnOptional.isEmpty()) {
                 continue;
             }
 
+            /*
+             * Optional 검사가 끝났으므로
+             * 실제 MapperColumnFact를 꺼내서 이후 사용
+             */
+            MapperColumnFact column =
+                    columnOptional.get();
+
             String tableName =
-                    column.get()
-                            .tableName();
+                    column.tableName();
 
             // 이미 같은 테이블에 대해 Finding을 생성했다면 중복 방지
-            if (!reportedTables.add(tableName)) {
+            if (!reportedTables.add(
+                    tableName
+            )) {
                 continue;
             }
 
@@ -126,6 +134,27 @@ public class MissingResourcePolicyRule
                 continue;
             }
 
+            List<Evidence> evidence =
+                    List.of(
+                            new Evidence(
+                                    EvidenceType.DATA_FLOW,
+                                    "Privacy resource detected",
+                                    tableName
+                                            + " contains data participating "
+                                            + "in a detected privacy flow.",
+                                    column.location()
+                            ),
+                            new Evidence(
+                                    EvidenceType.POLICY,
+                                    "Management policy",
+                                    "No resource policy was found "
+                                            + "for "
+                                            + tableName
+                                            + ".",
+                                    column.location()
+                            )
+                    );
+
             findings.add(
                     new Finding(
                             id(),
@@ -134,8 +163,8 @@ public class MissingResourcePolicyRule
                                     + tableName
                                     + " has no management policy.",
                             defaultSeverity(),
-                            column.get()
-                                    .location()
+                            column.location(),
+                            evidence
                     )
             );
         }

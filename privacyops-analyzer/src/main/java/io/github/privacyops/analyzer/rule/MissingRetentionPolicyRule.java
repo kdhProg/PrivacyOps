@@ -3,6 +3,8 @@ package io.github.privacyops.analyzer.rule;
 import io.github.privacyops.fact.MapperColumnFact;
 import io.github.privacyops.flow.DataFlowEdge;
 import io.github.privacyops.flow.DataFlowRelation;
+import io.github.privacyops.model.Evidence;
+import io.github.privacyops.model.EvidenceType;
 import io.github.privacyops.model.Finding;
 import io.github.privacyops.model.Severity;
 import io.github.privacyops.policy.ResourcePolicy;
@@ -121,6 +123,25 @@ public class MissingRetentionPolicyRule
                 continue;
             }
 
+            List<Evidence> evidence =
+                    List.of(
+                            new Evidence(
+                                    EvidenceType.POLICY,
+                                    "Privacy resource",
+                                    tableName
+                                            + " is registered as "
+                                            + "a managed privacy resource.",
+                                    column.location()
+                            ),
+                            new Evidence(
+                                    EvidenceType.POLICY,
+                                    "Retention policy",
+                                    tableName
+                                            + ".retention is not defined.",
+                                    column.location()
+                            )
+                    );
+
             findings.add(
                     new Finding(
                             id(),
@@ -129,7 +150,8 @@ public class MissingRetentionPolicyRule
                                     + tableName
                                     + " has no retention policy.",
                             defaultSeverity(),
-                            column.location()
+                            column.location(),
+                            evidence
                     )
             );
         }

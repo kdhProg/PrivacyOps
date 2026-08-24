@@ -486,6 +486,7 @@ public class ScanCommand implements Callable<Integer> {
 
         for (Finding finding : findings) {
 
+            // Finding 기본 정보
             System.out.printf(
                     "[%s] %s%n",
                     finding.severity(),
@@ -500,6 +501,7 @@ public class ScanCommand implements Callable<Integer> {
                     finding.description()
             );
 
+            // Finding 위치
             if (finding.location() != null) {
 
                 if (finding.location().line() != null) {
@@ -517,6 +519,56 @@ public class ScanCommand implements Callable<Integer> {
                             finding.location().file()
                     );
                 }
+            }
+
+            // Evidence 출력
+            if (finding.evidence() != null
+                    && !finding.evidence().isEmpty()) {
+
+                System.out.println(
+                        "Evidence:"
+                );
+
+                finding.evidence()
+                        .forEach(
+                                evidence -> {
+
+                                    System.out.printf(
+                                            "  - [%s] %s%n",
+                                            evidence.type(),
+                                            evidence.title()
+                                    );
+
+                                    if (evidence.description() != null
+                                            && !evidence.description().isBlank()) {
+
+                                        System.out.println(
+                                                "    "
+                                                        + evidence.description()
+                                        );
+                                    }
+
+                                    if (evidence.location() != null) {
+
+                                        if (evidence.location().line()
+                                                != null) {
+
+                                            System.out.printf(
+                                                    "    Location: %s:%d%n",
+                                                    evidence.location().file(),
+                                                    evidence.location().line()
+                                            );
+
+                                        } else {
+
+                                            System.out.printf(
+                                                    "    Location: %s%n",
+                                                    evidence.location().file()
+                                            );
+                                        }
+                                    }
+                                }
+                        );
             }
 
             System.out.println();

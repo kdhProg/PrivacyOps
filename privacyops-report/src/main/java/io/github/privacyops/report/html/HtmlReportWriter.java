@@ -232,6 +232,33 @@ public class HtmlReportWriter {
                             font-size: 12px;
                             margin-top: 32px;
                         }
+                        
+                        .evidence-block {
+                                    margin-top: 16px;
+                                    padding: 14px;
+                                    background: #f9fafb;
+                                    border: 1px solid #e5e7eb;
+                                    border-radius: 8px;
+                                }
+                        
+                                .evidence-title {
+                                    font-size: 13px;
+                                    font-weight: 700;
+                                    margin-bottom: 10px;
+                                }
+                        
+                                .evidence-item {
+                                    margin-bottom: 12px;
+                                }
+                        
+                                .evidence-item:last-child {
+                                    margin-bottom: 0;
+                                }
+                        
+                                .evidence-item strong {
+                                    margin-left: 8px;
+                                    font-size: 13px;
+                                }
                     </style>
                 </head>
 
@@ -743,6 +770,9 @@ public class HtmlReportWriter {
             for (Finding finding :
                     result.findings()) {
 
+                // -------------------------------------------------
+                // Finding 시작
+                // -------------------------------------------------
                 html.append(
                         """
                         <div class="finding">
@@ -770,7 +800,7 @@ public class HtmlReportWriter {
                 html.append(
                         """
                             </span>
-
+    
                             <div class="finding-title">
                         """
                 );
@@ -784,7 +814,7 @@ public class HtmlReportWriter {
                 html.append(
                         """
                             </div>
-
+    
                             <div class="finding-description">
                         """
                 );
@@ -801,6 +831,9 @@ public class HtmlReportWriter {
                         """
                 );
 
+                // -------------------------------------------------
+                // Finding Location
+                // -------------------------------------------------
                 if (finding.location() != null) {
 
                     html.append(
@@ -821,6 +854,7 @@ public class HtmlReportWriter {
                             .line() != null) {
 
                         html.append(":");
+
                         html.append(
                                 finding.location()
                                         .line()
@@ -834,6 +868,129 @@ public class HtmlReportWriter {
                     );
                 }
 
+                // -------------------------------------------------
+                // Evidence
+                // -------------------------------------------------
+                if (!finding.evidence()
+                        .isEmpty()) {
+
+                    html.append(
+                            """
+                            <div class="evidence-block">
+    
+                                <div class="evidence-title">
+                                    Evidence
+                                </div>
+                            """
+                    );
+
+                    for (var evidence :
+                            finding.evidence()) {
+
+                        html.append(
+                                """
+                                <div class="evidence-item">
+    
+                                    <span class="badge">
+                                """
+                        );
+
+                        html.append(
+                                escape(
+                                        evidence.type()
+                                                .name()
+                                )
+                        );
+
+                        html.append(
+                                """
+                                    </span>
+    
+                                    <strong>
+                                """
+                        );
+
+                        html.append(
+                                escape(
+                                        evidence.title()
+                                )
+                        );
+
+                        html.append(
+                                """
+                                    </strong>
+    
+                                    <div class="finding-description">
+                                """
+                        );
+
+                        html.append(
+                                escape(
+                                        evidence.description()
+                                )
+                        );
+
+                        html.append(
+                                """
+                                    </div>
+                                """
+                        );
+
+                        // -----------------------------------------
+                        // Evidence Location
+                        // -----------------------------------------
+                        if (evidence.location()
+                                != null) {
+
+                            html.append(
+                                    """
+                                    <div class="location">
+                                        Evidence location:
+                                    """
+                            );
+
+                            html.append(
+                                    escape(
+                                            evidence.location()
+                                                    .file()
+                                    )
+                            );
+
+                            if (evidence.location()
+                                    .line() != null) {
+
+                                html.append(":");
+
+                                html.append(
+                                        evidence.location()
+                                                .line()
+                                );
+                            }
+
+                            html.append(
+                                    """
+                                    </div>
+                                    """
+                            );
+                        }
+
+                        html.append(
+                                """
+                                </div>
+                                """
+                        );
+                    }
+
+                    html.append(
+                            """
+                            </div>
+                            """
+                    );
+                }
+
+                // -------------------------------------------------
+                // Finding 종료
+                // -------------------------------------------------
                 html.append(
                         """
                         </div>
