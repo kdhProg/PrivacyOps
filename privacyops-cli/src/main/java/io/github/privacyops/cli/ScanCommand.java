@@ -4,6 +4,7 @@ import io.github.privacyops.analyzer.engine.PrivacyOpsEngineFactory;
 import io.github.privacyops.analyzer.policy.YamlPolicyProvider;
 import io.github.privacyops.analyzer.risk.RiskEvaluator;
 import io.github.privacyops.analyzer.risk.YamlRiskProfileProvider;
+import io.github.privacyops.analyzer.rulepack.YamlRulePackProvider;
 import io.github.privacyops.engine.PrivacyOpsEngine;
 import io.github.privacyops.fact.*;
 import io.github.privacyops.flow.DataFlowEdge;
@@ -16,6 +17,7 @@ import io.github.privacyops.policy.PrivacyPolicy;
 import io.github.privacyops.report.html.HtmlReportWriter;
 import io.github.privacyops.risk.RiskAssessment;
 import io.github.privacyops.risk.RiskProfile;
+import io.github.privacyops.rulepack.RulePack;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -108,6 +110,14 @@ public class ScanCommand implements Callable<Integer> {
     )
     private Path riskProfilePath;
 
+    @Option(
+            names = "--rule-pack",
+            paramLabel = "<rule-pack-yml>",
+            description =
+                    "Custom PrivacyOps rule pack YAML file."
+    )
+    private Path rulePackPath;
+
     @Override
     public Integer call() {
 
@@ -190,10 +200,39 @@ public class ScanCommand implements Callable<Integer> {
             return 2;
         }
 
+        RulePack rulePack =
+                RulePack.defaults();
+
+        if (rulePackPath != null) {
+
+            if (!Files.isRegularFile(
+                    rulePackPath
+            )) {
+
+                System.err.println(
+                        "Rule pack file does not exist: "
+                                + rulePackPath
+                );
+
+                return 2;
+            }
+
+            YamlRulePackProvider provider =
+                    new YamlRulePackProvider();
+
+            rulePack =
+                    provider.load(
+                            rulePackPath
+                    );
+        }
+
+
         // 5. Engine 생성
         PrivacyOpsEngine engine =
                 PrivacyOpsEngineFactory
-                        .createDefault();
+                        .createDefault(
+                                rulePack
+                        );
 
         AnalysisResult result;
 
@@ -272,6 +311,10 @@ public class ScanCommand implements Callable<Integer> {
 
         printRiskSummary(
                 riskAssessments
+        );
+
+        printRulePackStatus(
+                rulePack
         );
 
         printDatabaseStatus(
@@ -1096,6 +1139,53 @@ public class ScanCommand implements Callable<Integer> {
                                         assessment.weight(),
                                         assessment.level()
                                 )
+                );
+    }
+
+    private void printRulePackStatus(
+            RulePack rulePack
+    ) {
+
+        System.out.println();
+        System.out.println("Rule Pack");
+        System.out.println(
+                "--------------------------------"
+        );
+
+        System.out.println(
+                "Name : "
+                        + rulePack.name()
+        );
+
+        if (rulePack.rules()
+                .isEmpty()) {
+
+            System.out.println(
+                    "Using PrivacyOps default rules."
+            );
+
+            return;
+        }
+
+        rulePack.rules()
+                .forEach(
+                        (ruleId, setting) -> {
+
+                            String severity =
+                                    setting.severity()
+                                            == null
+                                            ? "DEFAULT"
+                                            : setting
+                                            .severity()
+                                            .name();
+
+                            System.out.printf(
+                                    "%-22s enabled=%-5s severity=%s%n",
+                                    ruleId,
+                                    setting.enabled(),
+                                    severity
+                            );
+                        }
                 );
     }
 

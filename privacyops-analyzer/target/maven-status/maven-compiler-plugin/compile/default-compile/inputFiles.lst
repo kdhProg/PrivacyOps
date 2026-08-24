@@ -1,5 +1,6 @@
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\classifier\AnnotationPrivacyClassifier.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\classifier\NamePatternPrivacyClassifier.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\classifier\RiskProfilePrivacyClassifier.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\database\JdbcDatabaseScanner.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\engine\DefaultPrivacyOpsEngine.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\engine\PrivacyOpsEngineFactory.java
@@ -11,11 +12,15 @@ D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analy
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\policy\YamlPolicyProvider.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\PrivacyAnalysisService.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\project\DefaultProjectScanner.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\risk\RiskEvaluator.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\risk\YamlRiskProfileProvider.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\ApiPrivacyExposureRule.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\MissingAccessControlRule.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\MissingAuditControlRule.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\MissingDisposalPolicyRule.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\MissingResourcePolicyRule.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rule\MissingRetentionPolicyRule.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rulepack\ConfiguredPrivacyRule.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\rulepack\YamlRulePackProvider.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\io\github\privacyops\analyzer\spring\SpringControllerScanner.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-analyzer\src\main\java\org\example\Main.java

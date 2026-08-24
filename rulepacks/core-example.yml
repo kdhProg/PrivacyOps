@@ -1,0 +1,21 @@
+name: privacyops-core-example
+
+rules:
+
+  PRIV-API-001:
+    enabled: true
+
+  PRIV-ACCESS-001:
+    enabled: true
+
+  PRIV-AUDIT-001:
+    enabled: true
+
+  PRIV-POLICY-001:
+    enabled: true
+
+  PRIV-RETENTION-001:
+    enabled: true
+
+  PRIV-DISPOSAL-001:
+    enabled: true

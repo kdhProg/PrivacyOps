@@ -1,0 +1,27 @@
+name: strict-privacy-example
+
+rules:
+
+  PRIV-API-001:
+    enabled: true
+    severity: HIGH
+
+  PRIV-ACCESS-001:
+    enabled: true
+    severity: CRITICAL
+
+  PRIV-AUDIT-001:
+    enabled: true
+    severity: CRITICAL
+
+  PRIV-POLICY-001:
+    enabled: true
+    severity: HIGH
+
+  PRIV-RETENTION-001:
+    enabled: true
+    severity: CRITICAL
+
+  PRIV-DISPOSAL-001:
+    enabled: true
+    severity: CRITICAL

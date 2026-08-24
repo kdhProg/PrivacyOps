@@ -1,0 +1,10 @@
+name: strict-test
+
+rules:
+
+  PRIV-ACCESS-001:
+    enabled: true
+    severity: CRITICAL
+
+  PRIV-AUDIT-001:
+    enabled: false
