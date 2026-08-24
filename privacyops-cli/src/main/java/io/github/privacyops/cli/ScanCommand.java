@@ -2,6 +2,8 @@ package io.github.privacyops.cli;
 
 import io.github.privacyops.analyzer.engine.PrivacyOpsEngineFactory;
 import io.github.privacyops.analyzer.policy.YamlPolicyProvider;
+import io.github.privacyops.analyzer.risk.RiskEvaluator;
+import io.github.privacyops.analyzer.risk.YamlRiskProfileProvider;
 import io.github.privacyops.engine.PrivacyOpsEngine;
 import io.github.privacyops.fact.*;
 import io.github.privacyops.flow.DataFlowEdge;
@@ -12,6 +14,8 @@ import io.github.privacyops.model.Finding;
 import io.github.privacyops.model.PrivacyType;
 import io.github.privacyops.policy.PrivacyPolicy;
 import io.github.privacyops.report.html.HtmlReportWriter;
+import io.github.privacyops.risk.RiskAssessment;
+import io.github.privacyops.risk.RiskProfile;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
@@ -96,6 +100,14 @@ public class ScanCommand implements Callable<Integer> {
     )
     private Path reportPath;
 
+    @Option(
+            names = "--risk-profile",
+            paramLabel = "<risk-profile-yml>",
+            description =
+                    "Custom privacy risk profile YAML file."
+    )
+    private Path riskProfilePath;
+
     @Override
     public Integer call() {
 
@@ -136,7 +148,34 @@ public class ScanCommand implements Callable<Integer> {
                     );
         }
 
-        // 3. DB 옵션 검증
+        // 3. Risk Profile 로딩
+        RiskProfile riskProfile =
+                RiskProfile.defaults();
+
+        if (riskProfilePath != null) {
+
+            if (!Files.isRegularFile(
+                    riskProfilePath
+            )) {
+
+                System.err.println(
+                        "Risk profile file does not exist: "
+                                + riskProfilePath
+                );
+
+                return 2;
+            }
+
+            YamlRiskProfileProvider provider =
+                    new YamlRiskProfileProvider();
+
+            riskProfile =
+                    provider.load(
+                            riskProfilePath
+                    );
+        }
+
+        // 4. DB 옵션 검증
         if (hasAnyDatabaseOption()
                 && !hasAllDatabaseOptions()) {
 
@@ -151,14 +190,14 @@ public class ScanCommand implements Callable<Integer> {
             return 2;
         }
 
-        // 4. Engine 생성
+        // 5. Engine 생성
         PrivacyOpsEngine engine =
                 PrivacyOpsEngineFactory
                         .createDefault();
 
         AnalysisResult result;
 
-        // 5-A. DB 포함 분석
+        // 6-A. DB 포함 분석
         if (hasAllDatabaseOptions()) {
 
             String databasePassword =
@@ -202,7 +241,7 @@ public class ScanCommand implements Callable<Integer> {
 
         } else {
 
-            // 5-B. 기존 Source-only 분석
+            // 6-B. 기존 Source-only 분석
             result =
                     engine.analyze(
                             projectPath,
@@ -210,10 +249,29 @@ public class ScanCommand implements Callable<Integer> {
                     );
         }
 
-        // 6. 결과 출력
+        /*
+         * 7. Risk 평가
+         *
+         * 반드시 AnalysisResult가 생성된 이후
+         * 실행해야 한다.
+         */
+        RiskEvaluator riskEvaluator =
+                new RiskEvaluator();
+
+        List<RiskAssessment> riskAssessments =
+                riskEvaluator.evaluate(
+                        result.classifiedFacts(),
+                        riskProfile
+                );
+
+        // 8. 결과 출력
         printSummary(
                 projectPath,
                 result
+        );
+
+        printRiskSummary(
+                riskAssessments
         );
 
         printDatabaseStatus(
@@ -248,6 +306,7 @@ public class ScanCommand implements Callable<Integer> {
                 result.findings()
         );
 
+        // 9. HTML Report 생성
         if (reportPath != null) {
 
             HtmlReportWriter reportWriter =
@@ -255,6 +314,7 @@ public class ScanCommand implements Callable<Integer> {
 
             reportWriter.write(
                     result,
+                    riskAssessments,
                     reportPath
             );
 
@@ -1004,6 +1064,39 @@ public class ScanCommand implements Callable<Integer> {
                     mapperColumn.columnName()
             );
         }
+    }
+
+    private void printRiskSummary(
+            List<RiskAssessment> assessments
+    ) {
+
+        if (assessments.isEmpty()) {
+            return;
+        }
+
+        System.out.println();
+        System.out.println("Privacy Risk Profile");
+        System.out.println(
+                "--------------------------------"
+        );
+
+        assessments.stream()
+                .sorted(
+                        (a, b) ->
+                                Integer.compare(
+                                        b.weight(),
+                                        a.weight()
+                                )
+                )
+                .forEach(
+                        assessment ->
+                                System.out.printf(
+                                        "%-22s weight=%-3d level=%s%n",
+                                        assessment.privacyType(),
+                                        assessment.weight(),
+                                        assessment.level()
+                                )
+                );
     }
 
 }

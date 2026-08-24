@@ -9,12 +9,15 @@ import io.github.privacyops.model.Severity;
 import io.github.privacyops.policy.ResourcePolicy;
 import io.github.privacyops.report.score.GovernanceScore;
 import io.github.privacyops.report.score.GovernanceScoreCalculator;
+import io.github.privacyops.risk.RiskAssessment;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 public class HtmlReportWriter {
@@ -24,20 +27,44 @@ public class HtmlReportWriter {
             Path outputPath
     ) {
 
+        write(
+                result,
+                List.of(),
+                outputPath
+        );
+    }
+
+    public void write(
+            AnalysisResult result,
+            List<RiskAssessment> riskAssessments,
+            Path outputPath
+    ) {
+
         if (result == null) {
+
             throw new IllegalArgumentException(
                     "Analysis result must not be null."
             );
         }
 
+        if (riskAssessments == null) {
+
+            riskAssessments =
+                    List.of();
+        }
+
         if (outputPath == null) {
+
             throw new IllegalArgumentException(
                     "Output path must not be null."
             );
         }
 
         String html =
-                createHtml(result);
+                createHtml(
+                        result,
+                        riskAssessments
+                );
 
         try {
 
@@ -67,12 +94,23 @@ public class HtmlReportWriter {
     }
 
     private String createHtml(
-            AnalysisResult result
+            AnalysisResult result,
+            List<RiskAssessment> riskAssessments
     ) {
 
         GovernanceScore governance =
                 new GovernanceScoreCalculator()
                         .calculate(result);
+
+        RiskAssessment highestRisk =
+                riskAssessments
+                        .stream()
+                        .max(
+                                Comparator.comparingInt(
+                                        RiskAssessment::weight
+                                )
+                        )
+                        .orElse(null);
 
         StringBuilder html =
                 new StringBuilder();
@@ -282,12 +320,18 @@ public class HtmlReportWriter {
                 html,
                 result,
                 severityCounts,
-                governance
+                governance,
+                highestRisk
         );
 
         appendGovernanceCoverage(
                 html,
                 governance
+        );
+
+        appendRiskSummary(
+                html,
+                riskAssessments
         );
 
         appendPrivacyTypes(
@@ -329,7 +373,8 @@ public class HtmlReportWriter {
             StringBuilder html,
             AnalysisResult result,
             Map<Severity, Long> severityCounts,
-            GovernanceScore governance
+            GovernanceScore governance,
+            RiskAssessment highestRisk
     ) {
 
         html.append(
@@ -376,6 +421,14 @@ public class HtmlReportWriter {
                 "Governance Coverage",
                 governance.score()
                         + " / 100"
+        );
+
+        appendCard(
+                html,
+                "Highest Privacy Risk",
+                highestRisk == null
+                        ? "N/A"
+                        : highestRisk.level()
         );
 
         html.append(
@@ -1185,5 +1238,145 @@ public class HtmlReportWriter {
 
         html.append("</td>");
         html.append("</tr>");
+    }
+
+    private void appendRiskSummary(
+            StringBuilder html,
+            List<RiskAssessment> riskAssessments
+    ) {
+
+        html.append(
+                """
+                <div class="section">
+                    <h2 class="section-title">
+                        Privacy Risk Profile
+                    </h2>
+                """
+        );
+
+        if (riskAssessments.isEmpty()) {
+
+            html.append(
+                    """
+                    <div class="empty">
+                        No privacy risk assessments available.
+                    </div>
+                    </div>
+                    """
+            );
+
+            return;
+        }
+
+        Map<PrivacyType, RiskAssessment> highestByType =
+                new EnumMap<>(
+                        PrivacyType.class
+                );
+
+        for (RiskAssessment assessment :
+                riskAssessments) {
+
+            highestByType.merge(
+                    assessment.privacyType(),
+                    assessment,
+                    (existing, candidate) ->
+                            candidate.weight()
+                                    > existing.weight()
+                                    ? candidate
+                                    : existing
+            );
+        }
+
+
+        html.append(
+                """
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Privacy Type</th>
+                        <th>Weight</th>
+                        <th>Risk Level</th>
+                        <th>Reason</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                """
+        );
+
+        highestByType
+                .values()
+                .stream()
+                .sorted(
+                        Comparator
+                                .comparingInt(
+                                        RiskAssessment::weight
+                                )
+                                .reversed()
+                )
+                .forEach(
+                        assessment -> {
+
+                            html.append("<tr>");
+
+                            html.append("<td>");
+                            html.append(
+                                    escape(
+                                            assessment
+                                                    .privacyType()
+                                                    .name()
+                                    )
+                            );
+                            html.append("</td>");
+
+                            html.append("<td>");
+                            html.append(
+                                    assessment.weight()
+                            );
+                            html.append("</td>");
+
+                            html.append("<td>");
+                            html.append(
+                                    "<span class=\"badge\">"
+                            );
+
+                            html.append(
+                                    escape(
+                                            assessment.level()
+                                    )
+                            );
+
+                            html.append(
+                                    "</span>"
+                            );
+                            html.append("</td>");
+
+                            html.append("<td>");
+
+                            html.append(
+                                    escape(
+                                            assessment.reason()
+                                    )
+                            );
+
+                            html.append("</td>");
+
+                            html.append("</tr>");
+                        }
+                );
+
+        html.append(
+                """
+                    </tbody>
+                </table>
+    
+                <div class="subtitle">
+                    Risk levels are based on configurable
+                    privacy sensitivity weights and are
+                    independent from Governance Coverage.
+                </div>
+    
+                </div>
+                """
+        );
     }
 }

@@ -1,0 +1,24 @@
+privacy-types:
+
+  NAME:
+    weight: 1
+
+  EMAIL:
+    weight: 3
+
+  PHONE_NUMBER:
+    weight: 3
+
+  NATIONAL_IDENTIFIER:
+    weight: 10
+
+
+keywords:
+
+  employee_no:
+    type: NATIONAL_IDENTIFIER
+    weight: 8
+
+  mobile_tel:
+    type: PHONE_NUMBER
+    weight: 4
