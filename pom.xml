@@ -21,8 +21,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
         <junit.version>5.11.4</junit.version>
-        <maven.compiler.release>17</maven.compiler.release>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <picocli.version>4.7.7</picocli.version>
     </properties>
 
@@ -33,6 +31,7 @@
         <module>privacyops-cli</module>
         <module>privacyops-policy-api</module>
         <module>privacyops-report</module>
+        <module>privacyops-example-iam-plugin</module>
     </modules>
 
     <dependencyManagement>

@@ -1,6 +1,8 @@
 package io.github.privacyops.analyzer.engine;
 
+import io.github.privacyops.access.AccessControlProvider;
 import io.github.privacyops.analyzer.PrivacyAnalysisService;
+import io.github.privacyops.analyzer.access.AccessControlProviderLoader;
 import io.github.privacyops.analyzer.classifier.NamePatternPrivacyClassifier;
 import io.github.privacyops.analyzer.database.JdbcDatabaseScanner;
 import io.github.privacyops.analyzer.flow.ControllerResponseFlowLinker;
@@ -57,10 +59,16 @@ public final class PrivacyOpsEngineFactory {
                         )
                 );
 
+        List<AccessControlProvider> accessControlProviders =
+                new AccessControlProviderLoader()
+                        .load();
+
         List<PrivacyRule> baseRules =
                 List.of(
                         new ApiPrivacyExposureRule(),
-                        new MissingAccessControlRule(),
+                        new MissingAccessControlRule(
+                                accessControlProviders
+                        ),
                         new MissingAuditControlRule(),
                         new MissingResourcePolicyRule(),
                         new MissingRetentionPolicyRule(),

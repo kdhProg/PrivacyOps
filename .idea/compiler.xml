@@ -6,11 +6,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="privacyops-example-iam-plugin" />
         <module name="java8-policy-consumer" />
         <module name="privacyops-analyzer" />
         <module name="privacyops-cli" />
-        <module name="privacyops-domain" />
         <module name="privacyops-report" />
+        <module name="privacyops-domain" />
         <module name="privacyops-policy-api" />
       </profile>
     </annotationProcessing>

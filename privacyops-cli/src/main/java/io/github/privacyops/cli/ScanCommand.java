@@ -1,5 +1,7 @@
 package io.github.privacyops.cli;
 
+import io.github.privacyops.access.AccessControlProvider;
+import io.github.privacyops.analyzer.access.AccessControlProviderLoader;
 import io.github.privacyops.analyzer.engine.PrivacyOpsEngineFactory;
 import io.github.privacyops.analyzer.policy.YamlPolicyProvider;
 import io.github.privacyops.analyzer.risk.RiskEvaluator;
@@ -316,6 +318,8 @@ public class ScanCommand implements Callable<Integer> {
         printRulePackStatus(
                 rulePack
         );
+
+        printAccessControlProviders();
 
         printDatabaseStatus(
                 result
@@ -1187,6 +1191,29 @@ public class ScanCommand implements Callable<Integer> {
                             );
                         }
                 );
+    }
+
+    private void printAccessControlProviders() {
+
+        List<AccessControlProvider> providers =
+                new AccessControlProviderLoader()
+                        .load();
+
+        System.out.println();
+        System.out.println(
+                "Access Control Providers"
+        );
+
+        System.out.println(
+                "--------------------------------"
+        );
+
+        providers.forEach(
+                provider ->
+                        System.out.println(
+                                "- " + provider.id()
+                        )
+        );
     }
 
 }
