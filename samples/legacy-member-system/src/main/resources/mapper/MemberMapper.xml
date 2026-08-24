@@ -12,7 +12,8 @@
         EMAIL_ADDRESS,
         PHONE_NUMBER,
         ADDRESS,
-        DEPARTMENT_CODE
+        DEPARTMENT_CODE,
+        INTERNAL_TOKEN
         FROM TB_MEMBER
         WHERE MEMBER_ID = #{memberId}
 

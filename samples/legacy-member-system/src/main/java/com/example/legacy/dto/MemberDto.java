@@ -15,4 +15,6 @@ public class MemberDto {
     private String address;
 
     private String departmentCode;
+
+    private String internalToken;
 }

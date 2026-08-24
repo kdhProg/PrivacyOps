@@ -15,6 +15,10 @@ privacy-types:
 
 keywords:
 
+  internal_token:
+    type: NATIONAL_IDENTIFIER
+    weight: 8
+
   employee_no:
     type: NATIONAL_IDENTIFIER
     weight: 8

@@ -229,11 +229,12 @@ public class ScanCommand implements Callable<Integer> {
         }
 
 
-        // 5. Engine 생성
+// 5. Engine 생성
         PrivacyOpsEngine engine =
                 PrivacyOpsEngineFactory
                         .createDefault(
-                                rulePack
+                                rulePack,
+                                riskProfile
                         );
 
         AnalysisResult result;
