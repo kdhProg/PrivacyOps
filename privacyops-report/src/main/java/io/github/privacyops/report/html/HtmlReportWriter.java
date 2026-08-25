@@ -319,6 +319,33 @@ public class HtmlReportWriter implements PrivacyReportWriter {
                                     margin-left: 8px;
                                     font-size: 13px;
                                 }
+                                
+                                .flow-card {
+                                    margin-top: 16px;
+                                    padding: 18px;
+                                    border: 1px solid #e5e7eb;
+                                    border-radius: 10px;
+                                    text-align: center;
+                                    background: #f9fafb;
+                                }
+                        
+                                .flow-source,
+                                .flow-target {
+                                    font-weight: 700;
+                                    word-break: break-all;
+                                }
+                
+                                .flow-field {
+                                    padding: 10px;
+                                    font-size: 14px;
+                                    word-break: break-all;
+                                }
+                
+                                .flow-arrow {
+                                    padding: 5px;
+                                    font-size: 18px;
+                                    font-weight: 700;
+                                }
                     </style>
                 </head>
 
@@ -331,8 +358,7 @@ public class HtmlReportWriter implements PrivacyReportWriter {
                         </h1>
 
                         <div class="subtitle">
-                            Privacy governance analysis
-                            across application data flows
+                            Discover · Trace · Govern personal data across application systems
                         </div>
                     </div>
                 """
@@ -351,19 +377,15 @@ public class HtmlReportWriter implements PrivacyReportWriter {
                 governance
         );
 
-        appendRiskSummary(
+        appendPrivacyFlowMap(
                 html,
+                result,
                 riskAssessments
         );
 
-        appendPrivacyTypes(
+        appendRiskSummary(
                 html,
-                privacyCounts
-        );
-
-        appendDataFlowSummary(
-                html,
-                result
+                riskAssessments
         );
 
         appendPolicies(
@@ -372,6 +394,16 @@ public class HtmlReportWriter implements PrivacyReportWriter {
         );
 
         appendFindings(
+                html,
+                result
+        );
+
+        appendPrivacyTypes(
+                html,
+                privacyCounts
+        );
+
+        appendDataFlowSummary(
                 html,
                 result
         );
@@ -541,7 +573,7 @@ public class HtmlReportWriter implements PrivacyReportWriter {
                 """
                 <div class="section">
                     <h2 class="section-title">
-                        Privacy Types
+                        Findings & Evidence
                     </h2>
 
                     <table>
@@ -842,8 +874,21 @@ public class HtmlReportWriter implements PrivacyReportWriter {
 
         } else {
 
-            for (Finding finding :
-                    result.findings()) {
+                List<Finding> sortedFindings =
+                        result.findings()
+                                .stream()
+                                .sorted(
+                                        Comparator.comparingInt(
+                                                finding ->
+                                                        severityRank(
+                                                                finding.severity()
+                                                        )
+                                        )
+                                )
+                                .toList();
+
+                for (Finding finding :
+                        sortedFindings) {
 
                 // -------------------------------------------------
                 // Finding 시작
@@ -1219,10 +1264,9 @@ public class HtmlReportWriter implements PrivacyReportWriter {
                     </table>
     
                     <div class="subtitle">
-                        Coverage score indicates whether
-                        PrivacyOps-recognized governance controls
-                        are present. It is not a quantitative
-                        security-risk assessment.
+                        Governance Coverage represents the presence
+                        of PrivacyOps-recognized lifecycle and control
+                        requirements. It is independent from data sensitivity.
                     </div>
                 </div>
                 """
@@ -1400,5 +1444,280 @@ public class HtmlReportWriter implements PrivacyReportWriter {
                 </div>
                 """
         );
+    }
+
+    private void appendPrivacyFlowMap(
+            StringBuilder html,
+            AnalysisResult result,
+            List<RiskAssessment> riskAssessments
+    ) {
+
+        html.append(
+                """
+                <div class="section">
+                    <h2 class="section-title">
+                        Privacy Data Flow
+                    </h2>
+    
+                    <div class="subtitle">
+                        Detected personal-data paths across
+                        persistence, application objects and APIs.
+                    </div>
+                """
+        );
+
+        Map<String, ClassifiedFact> classifiedByFactId =
+                result.classifiedFacts()
+                        .stream()
+                        .collect(
+                                java.util.stream.Collectors.toMap(
+                                        item ->
+                                                item.fact().id(),
+                                        item -> item,
+                                        (a, b) -> a
+                                )
+                        );
+
+        Map<String, RiskAssessment> riskByFactId =
+                riskAssessments
+                        .stream()
+                        .collect(
+                                java.util.stream.Collectors.toMap(
+                                        RiskAssessment::factId,
+                                        item -> item,
+                                        (a, b) ->
+                                                a.weight()
+                                                        >= b.weight()
+                                                        ? a
+                                                        : b
+                                )
+                        );
+
+        /*
+         * Java privacy field 기준으로
+         * Mapper source와 API target을 찾아 묶는다.
+         */
+        for (ClassifiedFact classified :
+                result.classifiedFacts()) {
+
+            if (!(classified.fact()
+                    instanceof io.github.privacyops.fact.JavaFieldFact field)) {
+
+                continue;
+            }
+
+            String mapperSource =
+                    result.dataFlows()
+                            .stream()
+                            .filter(
+                                    edge ->
+                                            edge.relation()
+                                                    == DataFlowRelation
+                                                    .MAPPER_RESULT
+                                                    && edge.targetFactId()
+                                                    .equals(
+                                                            field.id()
+                                                    )
+                            )
+                            .map(
+                                    edge ->
+                                            findFactLabel(
+                                                    result,
+                                                    edge.sourceFactId()
+                                            )
+                            )
+                            .findFirst()
+                            .orElse(
+                                    "Application Source"
+                            );
+
+            String apiTarget =
+                    result.dataFlows()
+                            .stream()
+                            .filter(
+                                    edge ->
+                                            edge.relation()
+                                                    == DataFlowRelation
+                                                    .API_RESPONSE
+                                                    && edge.sourceFactId()
+                                                    .equals(
+                                                            field.id()
+                                                    )
+                            )
+                            .map(
+                                    edge ->
+                                            findFactLabel(
+                                                    result,
+                                                    edge.targetFactId()
+                                            )
+                            )
+                            .findFirst()
+                            .orElse(
+                                    "Application"
+                            );
+
+            RiskAssessment risk =
+                    riskByFactId.get(
+                            field.id()
+                    );
+
+            html.append(
+                    """
+                    <div class="flow-card">
+                        <div class="flow-source">
+                    """
+            );
+
+            html.append(
+                    escape(mapperSource)
+            );
+
+            html.append(
+                    """
+                        </div>
+    
+                        <div class="flow-arrow">
+                            ↓
+                        </div>
+    
+                        <div class="flow-field">
+                    """
+            );
+
+            html.append(
+                    escape(
+                            field.className()
+                                    + "."
+                                    + field.fieldName()
+                    )
+            );
+
+            html.append(
+                    " &nbsp; <span class=\"badge\">"
+            );
+
+            html.append(
+                    escape(
+                            classified
+                                    .classification()
+                                    .privacyType()
+                                    .name()
+                    )
+            );
+
+            html.append(
+                    "</span>"
+            );
+
+            if (risk != null) {
+
+                html.append(
+                        " <span class=\"badge\">"
+                );
+
+                html.append(
+                        escape(
+                                risk.level()
+                        )
+                );
+
+                html.append(
+                        "</span>"
+                );
+            }
+
+            html.append(
+                    """
+                        </div>
+    
+                        <div class="flow-arrow">
+                            ↓
+                        </div>
+    
+                        <div class="flow-target">
+                    """
+            );
+
+            html.append(
+                    escape(apiTarget)
+            );
+
+            html.append(
+                    """
+                        </div>
+                    </div>
+                    """
+            );
+        }
+
+        html.append(
+                """
+                </div>
+                """
+        );
+    }
+
+    private String findFactLabel(
+            AnalysisResult result,
+            String factId
+    ) {
+
+        return result.facts()
+                .stream()
+                .filter(
+                        fact ->
+                                fact.id()
+                                        .equals(
+                                                factId
+                                        )
+                )
+                .map(
+                        fact -> {
+
+                            if (fact instanceof
+                                    io.github.privacyops.fact.MapperColumnFact column) {
+
+                                return column.tableName()
+                                        + "."
+                                        + column.columnName();
+                            }
+
+                            if (fact instanceof
+                                    io.github.privacyops.fact.ApiEndpointFact endpoint) {
+
+                                return endpoint.httpMethod()
+                                        + " "
+                                        + endpoint.path();
+                            }
+
+                            if (fact instanceof
+                                    io.github.privacyops.fact.JavaFieldFact field) {
+
+                                return field.className()
+                                        + "."
+                                        + field.fieldName();
+                            }
+
+                            return fact.id();
+                        }
+                )
+                .findFirst()
+                .orElse(
+                        factId
+                );
+    }
+
+    private int severityRank(
+            Severity severity
+    ) {
+
+        return switch (severity) {
+
+            case CRITICAL -> 0;
+            case HIGH -> 1;
+            case MEDIUM -> 2;
+            case LOW -> 3;
+            default -> 99;
+        };
     }
 }
