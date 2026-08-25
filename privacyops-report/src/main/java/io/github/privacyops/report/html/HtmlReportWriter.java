@@ -7,6 +7,8 @@ import io.github.privacyops.model.Finding;
 import io.github.privacyops.model.PrivacyType;
 import io.github.privacyops.model.Severity;
 import io.github.privacyops.policy.ResourcePolicy;
+import io.github.privacyops.report.PrivacyReportWriter;
+import io.github.privacyops.report.ReportContext;
 import io.github.privacyops.report.score.GovernanceScore;
 import io.github.privacyops.report.score.GovernanceScoreCalculator;
 import io.github.privacyops.risk.RiskAssessment;
@@ -20,7 +22,27 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-public class HtmlReportWriter {
+public class HtmlReportWriter implements PrivacyReportWriter {
+
+    @Override
+    public String format() {
+
+        return "html";
+    }
+
+    @Override
+    public void write(
+            ReportContext context,
+            Path outputPath
+    ) {
+
+        write(
+                context.analysisResult(),
+                context.riskAssessments(),
+                outputPath
+        );
+    }
+
 
     public void write(
             AnalysisResult result,

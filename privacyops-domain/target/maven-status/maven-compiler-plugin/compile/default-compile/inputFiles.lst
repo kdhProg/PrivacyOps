@@ -26,6 +26,8 @@ D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domai
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\policy\PolicyProvider.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\policy\PrivacyPolicy.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\policy\ResourcePolicy.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\report\PrivacyReportWriter.java
+D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\report\ReportContext.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\risk\KeywordRiskRule.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\risk\RiskAssessment.java
 D:\entire_workspace\2026opensw_competition\workspace\PrivacyOps\privacyops-domain\src\main\java\io\github\privacyops\risk\RiskProfile.java

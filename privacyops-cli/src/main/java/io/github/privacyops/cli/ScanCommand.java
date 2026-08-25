@@ -16,7 +16,9 @@ import io.github.privacyops.model.ClassifiedFact;
 import io.github.privacyops.model.Finding;
 import io.github.privacyops.model.PrivacyType;
 import io.github.privacyops.policy.PrivacyPolicy;
+import io.github.privacyops.report.ReportContext;
 import io.github.privacyops.report.html.HtmlReportWriter;
+import io.github.privacyops.report.json.JsonReportWriter;
 import io.github.privacyops.risk.RiskAssessment;
 import io.github.privacyops.risk.RiskProfile;
 import io.github.privacyops.rulepack.RulePack;
@@ -119,6 +121,14 @@ public class ScanCommand implements Callable<Integer> {
                     "Custom PrivacyOps rule pack YAML file."
     )
     private Path rulePackPath;
+
+    @Option(
+            names = "--json-report",
+            paramLabel = "<json-file>",
+            description =
+                    "Write analysis result as a JSON report."
+    )
+    private Path jsonReportPath;
 
     @Override
     public Integer call() {
@@ -306,6 +316,12 @@ public class ScanCommand implements Callable<Integer> {
                         riskProfile
                 );
 
+        ReportContext reportContext =
+                new ReportContext(
+                        result,
+                        riskAssessments
+                );
+
         // 8. 결과 출력
         printSummary(
                 projectPath,
@@ -361,8 +377,7 @@ public class ScanCommand implements Callable<Integer> {
                     new HtmlReportWriter();
 
             reportWriter.write(
-                    result,
-                    riskAssessments,
+                    reportContext,
                     reportPath
             );
 
@@ -373,6 +388,27 @@ public class ScanCommand implements Callable<Integer> {
 
             System.out.println(
                     reportPath
+                            .toAbsolutePath()
+            );
+        }
+
+        if (jsonReportPath != null) {
+
+            JsonReportWriter jsonReportWriter =
+                    new JsonReportWriter();
+
+            jsonReportWriter.write(
+                    reportContext,
+                    jsonReportPath
+            );
+
+            System.out.println();
+            System.out.println(
+                    "JSON report written to:"
+            );
+
+            System.out.println(
+                    jsonReportPath
                             .toAbsolutePath()
             );
         }
