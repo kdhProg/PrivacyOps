@@ -702,35 +702,11 @@ PrivacyOps
 # Analysis Pipeline
 
 Internally, PrivacyOps follows a staged analysis model.
-
 ```text
-              ┌───────────────┐
-              │    Scanner    │
-              └───────┬───────┘
-                      ↓
-              ┌───────────────┐
-              │  Fact Model   │
-              └───────┬───────┘
-                      ↓
-              ┌───────────────┐
-              │  Classifier   │
-              └───────┬───────┘
-                      ↓
-              ┌───────────────┐
-              │Data Flow Linker│
-              └───────┬───────┘
-                      ↓
-              ┌───────────────┐
-              │Governance Rule│
-              │    Engine     │
-              └───────┬───────┘
-                      ↓
-              ┌───────────────┐
-              │Finding/Evidence│
-              └───────┬───────┘
-                      ↓
-             CLI / HTML / JSON
+Scanner > Fact Model > Classifier > Data Flow Linker 
+> Governance Rule Engine > Finding/Evidence
 ```
+
 
 ---
 
@@ -820,20 +796,13 @@ Potential future development areas include:
 
 - Additional ORM support
 - JPA / Hibernate analysis
-- Additional web frameworks
 - Additional database metadata adapters
-- More sophisticated inter-procedural data-flow analysis
 - Authentication / authorization provider integrations
 - Audit and SIEM provider SPI
-- SARIF output
 - CI/CD integration
-- GitHub Actions integration
 - IDE integration
 - Additional privacy rule packs
 - Organization-specific governance profiles
-- International privacy-framework mappings
-- Automated SBOM generation
-- Privacy architecture visualization
 - AI-assisted explanation of generated evidence
 
 AI integration, where introduced, is intended to operate as an **optional interpretation or recommendation layer over structured PrivacyOps evidence**, rather than replacing the deterministic core analysis engine.
@@ -877,28 +846,6 @@ Rather than embedding organization-specific privacy logic directly into the engi
 
 ---
 
-# Contributing
-
-Contributions are welcome.
-
-Potential contribution areas include:
-
-- privacy classifiers
-- framework scanners
-- database adapters
-- Data Flow Linkers
-- Privacy Rules
-- Rule Packs
-- Risk Profiles
-- SPI providers
-- reporters
-- sample applications
-- documentation
-
-For significant changes, opening an issue before implementation is recommended so that the proposed design can be discussed.
-
----
-
 # Security and Analysis Limitations
 
 PrivacyOps performs static and metadata-based analysis.
@@ -915,37 +862,3 @@ Results may contain false positives or false negatives depending on:
 - incomplete configuration
 
 PrivacyOps findings should therefore be interpreted as **engineering evidence for review**, not as an automatic legal or compliance determination.
-
----
-
-# License
-
-Copyright 2026 PrivacyOps Contributors
-
-Licensed under the **Apache License, Version 2.0**.
-
-You may use, modify, and distribute this project in accordance with the terms of the license.
-
-See the `LICENSE` file for details.
-
----
-
-# Project Vision
-
-PrivacyOps ultimately aims to provide a common technical layer between:
-
-```text
-Application Development
-        +
-Cybersecurity
-        +
-Privacy Engineering
-        +
-Data Governance
-```
-
-so that personal data can be:
-
-> **Discovered, traced, governed, and explained.**
-
-**PrivacyOps — Discover → Trace → Govern → Evidence**
