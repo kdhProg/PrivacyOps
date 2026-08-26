@@ -820,39 +820,3 @@ Major technologies used by the project include:
 | JUnit 5 | Automated testing |
 | H2 | JDBC scanner testing |
 
----
-
-# Open Source
-
-PrivacyOps is designed as an open-source project.
-
-The project aims to provide reusable building blocks for:
-
-- developers
-- security engineers
-- privacy engineers
-- system architects
-- governance teams
-- researchers
-- open-source contributors
-
-Rather than embedding organization-specific privacy logic directly into the engine, PrivacyOps attempts to expose reusable models and extension points that can be adapted to different environments.
-
----
-
-# Security and Analysis Limitations
-
-PrivacyOps performs static and metadata-based analysis.
-
-Results may contain false positives or false negatives depending on:
-
-- application architecture
-- naming conventions
-- runtime behavior
-- reflection
-- dynamically generated queries
-- custom frameworks
-- external services
-- incomplete configuration
-
-PrivacyOps findings should therefore be interpreted as **engineering evidence for review**, not as an automatic legal or compliance determination.
