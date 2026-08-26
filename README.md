@@ -624,7 +624,7 @@ mvn -version
 Clone the repository and build all modules:
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
+git clone https://github.com/kdhProg/PrivacyOps
 cd PrivacyOps
 
 mvn clean verify
