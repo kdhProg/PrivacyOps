@@ -18,6 +18,32 @@ The current prototype focuses on **Java / Spring / MyBatis / JDBC-based applicat
 
 ---
 
+# What PrivacyOps Is — and Is Not
+
+PrivacyOps **is**:
+
+- a privacy engineering toolkit
+- a static analysis framework
+- a privacy data-flow analyzer
+- a policy and governance validation engine
+- an evidence generator
+- an extensible integration foundation
+
+PrivacyOps is **not**:
+
+- a DLP replacement
+- an IAM product
+- a SIEM product
+- a database encryption product
+- a legal compliance certification tool
+- a guarantee of regulatory compliance
+
+PrivacyOps provides technical evidence that can support privacy engineering and governance activities.
+
+Final legal and organizational compliance decisions remain the responsibility of the organization using the tool.
+
+---
+
 ## Why PrivacyOps?
 
 Privacy-related checks are often fragmented across different layers.
@@ -508,6 +534,32 @@ A human-readable report provides a visual summary of:
 - findings
 - evidence
 - policy status
+- 
+### Report Overview
+
+<img width="1251" height="804" alt="Image" src="https://github.com/user-attachments/assets/3eee3cb5-893c-48b8-a7e3-3dd8a4d79a8c" />
+
+### Findings & Evidence
+
+<img width="1133" height="423" alt="Image" src="https://github.com/user-attachments/assets/a8f236d0-5c31-4cb9-a936-f6dd7735a780" />
+
+The full example report generated from the included legacy sample project is available here:
+
+```text
+./privacyops-report.html
+```
+
+The report was generated using:
+
+```bash
+java -jar privacyops-cli/target/privacyops-cli-0.1.0.jar scan
+  ./samples/legacy-member-system
+  --policy ./samples/legacy-member-system/policies/incomplete.yml
+  --risk-profile ./samples/legacy-member-system/risk-profile.yml
+  --rule-pack ./rulepacks/strict-example.yml
+  --report ./privacyops-report.html
+  --json-report ./privacyops-report.json
+```
 
 ---
 
@@ -707,64 +759,6 @@ Scanner > Fact Model > Classifier > Data Flow Linker
 > Governance Rule Engine > Finding/Evidence
 ```
 
-
----
-
-# Design Principles
-
-PrivacyOps is being developed around several principles.
-
-### Explainability over black-box scoring
-
-A finding should include evidence explaining why it exists.
-
-### Configuration over hard-coding
-
-Privacy requirements differ across organizations.
-
-Policies, Risk Profiles, and Rule Packs therefore remain configurable.
-
-### Integration over replacement
-
-PrivacyOps is not intended to replace IAM, SIEM, audit, HR, or database-security systems.
-
-Instead, it provides an analysis layer that can integrate signals from those systems.
-
-### Data flow over isolated detection
-
-Finding a privacy-related keyword is useful.
-
-Understanding where that information flows is more useful.
-
-### Open extension over vendor lock-in
-
-SPI-based integration allows additional governance environments to participate without modifying the core engine.
-
----
-
-# What PrivacyOps Is — and Is Not
-
-PrivacyOps **is**:
-
-- a privacy engineering toolkit
-- a static analysis framework
-- a privacy data-flow analyzer
-- a policy and governance validation engine
-- an evidence generator
-- an extensible integration foundation
-
-PrivacyOps is **not**:
-
-- a DLP replacement
-- an IAM product
-- a SIEM product
-- a database encryption product
-- a legal compliance certification tool
-- a guarantee of regulatory compliance
-
-PrivacyOps provides technical evidence that can support privacy engineering and governance activities.
-
-Final legal and organizational compliance decisions remain the responsibility of the organization using the tool.
 
 ---
 

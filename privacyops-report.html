@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <title>PrivacyOps Analysis Report</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f5f7fa;
+            color: #1f2937;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Arial,
+                sans-serif;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 24px 80px;
+        }
+
+        .header {
+            margin-bottom: 32px;
+        }
+
+        .title {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .subtitle {
+            margin-top: 8px;
+            color: #6b7280;
+        }
+
+        .cards {
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .card-label {
+            color: #6b7280;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .card-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .section {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            margin: 0 0 20px;
+            font-size: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+            vertical-align: top;
+        }
+
+        th {
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 9px;
+            border-radius: 6px;
+            background: #eef2f7;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .finding {
+            padding: 18px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .finding:last-child {
+            border-bottom: none;
+        }
+
+        .finding-title {
+            font-weight: 700;
+            margin: 8px 0;
+        }
+
+        .finding-description {
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .location {
+            margin-top: 8px;
+            color: #6b7280;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        .empty {
+            color: #6b7280;
+        }
+
+        .footer {
+            color: #9ca3af;
+            font-size: 12px;
+            margin-top: 32px;
+        }
+
+        .evidence-block {
+                    margin-top: 16px;
+                    padding: 14px;
+                    background: #f9fafb;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 8px;
+                }
+
+                .evidence-title {
+                    font-size: 13px;
+                    font-weight: 700;
+                    margin-bottom: 10px;
+                }
+
+                .evidence-item {
+                    margin-bottom: 12px;
+                }
+
+                .evidence-item:last-child {
+                    margin-bottom: 0;
+                }
+
+                .evidence-item strong {
+                    margin-left: 8px;
+                    font-size: 13px;
+                }
+
+                .flow-card {
+                    margin-top: 16px;
+                    padding: 18px;
+                    border: 1px solid #e5e7eb;
+                    border-radius: 10px;
+                    text-align: center;
+                    background: #f9fafb;
+                }
+
+                .flow-source,
+                .flow-target {
+                    font-weight: 700;
+                    word-break: break-all;
+                }
+
+                .flow-field {
+                    padding: 10px;
+                    font-size: 14px;
+                    word-break: break-all;
+                }
+
+                .flow-arrow {
+                    padding: 5px;
+                    font-size: 18px;
+                    font-weight: 700;
+                }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1 class="title">
+            PrivacyOps Analysis Report
+        </h1>
+
+        <div class="subtitle">
+            Discover · Trace · Govern personal data across application systems
+        </div>
+    </div>
+<div class="cards">
+<div class="card">
+    <div class="card-label">
+Facts    </div>
+
+    <div class="card-value">
+18    </div>
+</div>
+<div class="card">
+    <div class="card-label">
+Privacy Candidates    </div>
+
+    <div class="card-value">
+6    </div>
+</div>
+<div class="card">
+    <div class="card-label">
+Data Flows    </div>
+
+    <div class="card-value">
+16    </div>
+</div>
+<div class="card">
+    <div class="card-label">
+Findings    </div>
+
+    <div class="card-value">
+8    </div>
+</div>
+<div class="card">
+    <div class="card-label">
+Critical Findings    </div>
+
+    <div class="card-value">
+3    </div>
+</div>
+<div class="card">
+    <div class="card-label">
+Governance Coverage    </div>
+
+    <div class="card-value">
+40 / 100    </div>
+</div>
+<div class="card">
+    <div class="card-label">
+Highest Privacy Risk    </div>
+
+    <div class="card-value">
+CRITICAL    </div>
+</div>
+</div>
+<div class="section">
+    <h2 class="section-title">
+        Governance Coverage
+    </h2>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Control</th>
+            <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+<tr><td>Resource Policy</td><td><span class="badge">DETECTED</span></td></tr><tr><td>Retention</td><td><span class="badge">MISSING</span></td></tr><tr><td>Disposal</td><td><span class="badge">MISSING</span></td></tr><tr><td>Access Control</td><td><span class="badge">DETECTED</span></td></tr><tr><td>Audit Control</td><td><span class="badge">MISSING</span></td></tr>        </tbody>
+    </table>
+
+    <div class="subtitle">
+        Governance Coverage represents the presence
+        of PrivacyOps-recognized lifecycle and control
+        requirements. It is independent from data sensitivity.
+    </div>
+</div>
+<div class="section">
+    <h2 class="section-title">
+        Privacy Data Flow
+    </h2>
+
+    <div class="subtitle">
+        Detected personal-data paths across
+        persistence, application objects and APIs.
+    </div>
+<div class="flow-card">
+    <div class="flow-source">
+TB_MEMBER.NAME    </div>
+
+    <div class="flow-arrow">
+        ↓
+    </div>
+
+    <div class="flow-field">
+com.example.legacy.dto.MemberDto.name &nbsp; <span class="badge">NAME</span> <span class="badge">LOW</span>    </div>
+
+    <div class="flow-arrow">
+        ↓
+    </div>
+
+    <div class="flow-target">
+GET /members/{id}    </div>
+</div>
+<div class="flow-card">
+    <div class="flow-source">
+TB_MEMBER.RESIDENT_NUMBER    </div>
+
+    <div class="flow-arrow">
+        ↓
+    </div>
+
+    <div class="flow-field">
+com.example.legacy.dto.MemberDto.residentNumber &nbsp; <span class="badge">NATIONAL_IDENTIFIER</span> <span class="badge">CRITICAL</span>    </div>
+
+    <div class="flow-arrow">
+        ↓
+    </div>
+
+    <div class="flow-target">
+GET /members/{id}    </div>
+</div>
+<div class="flow-card">
+    <div class="flow-source">
+TB_MEMBER.EMAIL_ADDRESS    </div>
+
+    <div class="flow-arrow">
+        ↓
+    </div>
+
+    <div class="flow-field">
+com.example.legacy.dto.MemberDto.emailAddress &nbsp; <span class="badge">EMAIL</span> <span class="badge">MEDIUM</span>    </div>
+
+    <div class="flow-arrow">
+        ↓
+    </div>
+
+    <div class="flow-target">
+GET /members/{id}    </div>
+</div>
+<div class="flow-card">
+    <div class="flow-source">
+TB_MEMBER.PHONE_NUMBER    </div>
+
+    <div class="flow-arrow">
+        ↓
+    </div>
+
+    <div class="flow-field">
+com.example.legacy.dto.MemberDto.phoneNumber &nbsp; <span class="badge">PHONE_NUMBER</span> <span class="badge">MEDIUM</span>    </div>
+
+    <div class="flow-arrow">
+        ↓
+    </div>
+
+    <div class="flow-target">
+GET /members/{id}    </div>
+</div>
+<div class="flow-card">
+    <div class="flow-source">
+TB_MEMBER.INTERNAL_TOKEN    </div>
+
+    <div class="flow-arrow">
+        ↓
+    </div>
+
+    <div class="flow-field">
+com.example.legacy.dto.MemberDto.internalToken &nbsp; <span class="badge">NATIONAL_IDENTIFIER</span> <span class="badge">CRITICAL</span>    </div>
+
+    <div class="flow-arrow">
+        ↓
+    </div>
+
+    <div class="flow-target">
+GET /members/{id}    </div>
+</div>
+</div>
+<div class="section">
+    <h2 class="section-title">
+        Privacy Risk Profile
+    </h2>
+<table>
+    <thead>
+    <tr>
+        <th>Privacy Type</th>
+        <th>Weight</th>
+        <th>Risk Level</th>
+        <th>Reason</th>
+    </tr>
+    </thead>
+    <tbody>
+<tr><td>NATIONAL_IDENTIFIER</td><td>10</td><td><span class="badge">CRITICAL</span></td><td>Privacy type weight</td></tr><tr><td>EMAIL</td><td>3</td><td><span class="badge">MEDIUM</span></td><td>Privacy type weight</td></tr><tr><td>PHONE_NUMBER</td><td>3</td><td><span class="badge">MEDIUM</span></td><td>Privacy type weight</td></tr><tr><td>NAME</td><td>1</td><td><span class="badge">LOW</span></td><td>Privacy type weight</td></tr>    </tbody>
+</table>
+
+<div class="subtitle">
+    Risk levels are based on configurable
+    privacy sensitivity weights and are
+    independent from Governance Coverage.
+</div>
+
+</div>
+<div class="section">
+    <h2 class="section-title">
+        Privacy Management Policies
+    </h2>
+<table>
+    <thead>
+    <tr>
+        <th>Resource</th>
+        <th>Purpose</th>
+        <th>Retention</th>
+        <th>Disposal</th>
+    </tr>
+    </thead>
+    <tbody>
+<tr><td>TB_MEMBER</td><td>member-management</td><td>NOT SET</td><td>NOT SET</td></tr>    </tbody>
+</table>
+</div>
+<div class="section">
+    <h2 class="section-title">
+        Findings
+    </h2>
+<div class="finding">
+    <span class="badge">
+CRITICAL · PRIV-AUDIT-001    </span>
+
+    <div class="finding-title">
+Missing audit control    </div>
+
+    <div class="finding-description">
+Privacy API GET /members/{id} has no recognized audit control.    </div>
+<div class="location">
+    Location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\controller\MemberController.java:13</div>
+<div class="evidence-block">
+
+    <div class="evidence-title">
+        Evidence
+    </div>
+<div class="evidence-item">
+
+    <span class="badge">
+DATA_FLOW    </span>
+
+    <strong>
+Privacy API detected    </strong>
+
+    <div class="finding-description">
+GET /members/{id}    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\controller\MemberController.java:13</div>
+</div>
+<div class="evidence-item">
+
+    <span class="badge">
+SOURCE_CODE    </span>
+
+    <strong>
+Audit control    </strong>
+
+    <div class="finding-description">
+No recognized audit control was found for this endpoint.    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\controller\MemberController.java:13</div>
+</div>
+</div>
+</div>
+<div class="finding">
+    <span class="badge">
+CRITICAL · PRIV-RETENTION-001    </span>
+
+    <div class="finding-title">
+Missing retention policy    </div>
+
+    <div class="finding-description">
+Privacy resource TB_MEMBER has no retention policy.    </div>
+<div class="location">
+    Location:
+.\samples\legacy-member-system\src\main\resources\mapper\MemberMapper.xml</div>
+<div class="evidence-block">
+
+    <div class="evidence-title">
+        Evidence
+    </div>
+<div class="evidence-item">
+
+    <span class="badge">
+POLICY    </span>
+
+    <strong>
+Privacy resource    </strong>
+
+    <div class="finding-description">
+TB_MEMBER is registered as a managed privacy resource.    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\resources\mapper\MemberMapper.xml</div>
+</div>
+<div class="evidence-item">
+
+    <span class="badge">
+POLICY    </span>
+
+    <strong>
+Retention policy    </strong>
+
+    <div class="finding-description">
+TB_MEMBER.retention is not defined.    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\resources\mapper\MemberMapper.xml</div>
+</div>
+</div>
+</div>
+<div class="finding">
+    <span class="badge">
+CRITICAL · PRIV-DISPOSAL-001    </span>
+
+    <div class="finding-title">
+Missing disposal policy    </div>
+
+    <div class="finding-description">
+Privacy resource TB_MEMBER has no disposal policy.    </div>
+<div class="location">
+    Location:
+.\samples\legacy-member-system\src\main\resources\mapper\MemberMapper.xml</div>
+<div class="evidence-block">
+
+    <div class="evidence-title">
+        Evidence
+    </div>
+<div class="evidence-item">
+
+    <span class="badge">
+POLICY    </span>
+
+    <strong>
+Privacy resource    </strong>
+
+    <div class="finding-description">
+TB_MEMBER is registered as a managed privacy resource.    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\resources\mapper\MemberMapper.xml</div>
+</div>
+<div class="evidence-item">
+
+    <span class="badge">
+POLICY    </span>
+
+    <strong>
+Disposal policy    </strong>
+
+    <div class="finding-description">
+TB_MEMBER.disposal is not defined.    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\resources\mapper\MemberMapper.xml</div>
+</div>
+</div>
+</div>
+<div class="finding">
+    <span class="badge">
+HIGH · PRIV-API-001    </span>
+
+    <div class="finding-title">
+Personal data in API response    </div>
+
+    <div class="finding-description">
+Privacy field com.example.legacy.dto.MemberDto.name (NAME) may be exposed through GET /members/{id}.    </div>
+<div class="location">
+    Location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\controller\MemberController.java:13</div>
+<div class="evidence-block">
+
+    <div class="evidence-title">
+        Evidence
+    </div>
+<div class="evidence-item">
+
+    <span class="badge">
+DATA_FLOW    </span>
+
+    <strong>
+Privacy field detected    </strong>
+
+    <div class="finding-description">
+com.example.legacy.dto.MemberDto.name [NAME]    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\dto\MemberDto.java:7</div>
+</div>
+<div class="evidence-item">
+
+    <span class="badge">
+SOURCE_CODE    </span>
+
+    <strong>
+API endpoint    </strong>
+
+    <div class="finding-description">
+GET /members/{id}    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\controller\MemberController.java:13</div>
+</div>
+</div>
+</div>
+<div class="finding">
+    <span class="badge">
+HIGH · PRIV-API-001    </span>
+
+    <div class="finding-title">
+Personal data in API response    </div>
+
+    <div class="finding-description">
+Privacy field com.example.legacy.dto.MemberDto.residentNumber (NATIONAL_IDENTIFIER) may be exposed through GET /members/{id}.    </div>
+<div class="location">
+    Location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\controller\MemberController.java:13</div>
+<div class="evidence-block">
+
+    <div class="evidence-title">
+        Evidence
+    </div>
+<div class="evidence-item">
+
+    <span class="badge">
+DATA_FLOW    </span>
+
+    <strong>
+Privacy field detected    </strong>
+
+    <div class="finding-description">
+com.example.legacy.dto.MemberDto.residentNumber [NATIONAL_IDENTIFIER]    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\dto\MemberDto.java:9</div>
+</div>
+<div class="evidence-item">
+
+    <span class="badge">
+SOURCE_CODE    </span>
+
+    <strong>
+API endpoint    </strong>
+
+    <div class="finding-description">
+GET /members/{id}    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\controller\MemberController.java:13</div>
+</div>
+</div>
+</div>
+<div class="finding">
+    <span class="badge">
+HIGH · PRIV-API-001    </span>
+
+    <div class="finding-title">
+Personal data in API response    </div>
+
+    <div class="finding-description">
+Privacy field com.example.legacy.dto.MemberDto.emailAddress (EMAIL) may be exposed through GET /members/{id}.    </div>
+<div class="location">
+    Location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\controller\MemberController.java:13</div>
+<div class="evidence-block">
+
+    <div class="evidence-title">
+        Evidence
+    </div>
+<div class="evidence-item">
+
+    <span class="badge">
+DATA_FLOW    </span>
+
+    <strong>
+Privacy field detected    </strong>
+
+    <div class="finding-description">
+com.example.legacy.dto.MemberDto.emailAddress [EMAIL]    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\dto\MemberDto.java:11</div>
+</div>
+<div class="evidence-item">
+
+    <span class="badge">
+SOURCE_CODE    </span>
+
+    <strong>
+API endpoint    </strong>
+
+    <div class="finding-description">
+GET /members/{id}    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\controller\MemberController.java:13</div>
+</div>
+</div>
+</div>
+<div class="finding">
+    <span class="badge">
+HIGH · PRIV-API-001    </span>
+
+    <div class="finding-title">
+Personal data in API response    </div>
+
+    <div class="finding-description">
+Privacy field com.example.legacy.dto.MemberDto.phoneNumber (PHONE_NUMBER) may be exposed through GET /members/{id}.    </div>
+<div class="location">
+    Location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\controller\MemberController.java:13</div>
+<div class="evidence-block">
+
+    <div class="evidence-title">
+        Evidence
+    </div>
+<div class="evidence-item">
+
+    <span class="badge">
+DATA_FLOW    </span>
+
+    <strong>
+Privacy field detected    </strong>
+
+    <div class="finding-description">
+com.example.legacy.dto.MemberDto.phoneNumber [PHONE_NUMBER]    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\dto\MemberDto.java:13</div>
+</div>
+<div class="evidence-item">
+
+    <span class="badge">
+SOURCE_CODE    </span>
+
+    <strong>
+API endpoint    </strong>
+
+    <div class="finding-description">
+GET /members/{id}    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\controller\MemberController.java:13</div>
+</div>
+</div>
+</div>
+<div class="finding">
+    <span class="badge">
+HIGH · PRIV-API-001    </span>
+
+    <div class="finding-title">
+Personal data in API response    </div>
+
+    <div class="finding-description">
+Privacy field com.example.legacy.dto.MemberDto.internalToken (NATIONAL_IDENTIFIER) may be exposed through GET /members/{id}.    </div>
+<div class="location">
+    Location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\controller\MemberController.java:13</div>
+<div class="evidence-block">
+
+    <div class="evidence-title">
+        Evidence
+    </div>
+<div class="evidence-item">
+
+    <span class="badge">
+DATA_FLOW    </span>
+
+    <strong>
+Privacy field detected    </strong>
+
+    <div class="finding-description">
+com.example.legacy.dto.MemberDto.internalToken [NATIONAL_IDENTIFIER]    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\dto\MemberDto.java:19</div>
+</div>
+<div class="evidence-item">
+
+    <span class="badge">
+SOURCE_CODE    </span>
+
+    <strong>
+API endpoint    </strong>
+
+    <div class="finding-description">
+GET /members/{id}    </div>
+<div class="location">
+    Evidence location:
+.\samples\legacy-member-system\src\main\java\com\example\legacy\controller\MemberController.java:13</div>
+</div>
+</div>
+</div>
+</div>
+<div class="section">
+    <h2 class="section-title">
+        Findings & Evidence
+    </h2>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Type</th>
+            <th>Detected</th>
+        </tr>
+        </thead>
+        <tbody>
+<tr><td>NAME</td><td>1</td></tr><tr><td>EMAIL</td><td>1</td></tr><tr><td>PHONE_NUMBER</td><td>1</td></tr><tr><td>NATIONAL_IDENTIFIER</td><td>3</td></tr>        </tbody>
+    </table>
+</div>
+<div class="section">
+    <h2 class="section-title">
+        Data Flow Summary
+    </h2>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Relation</th>
+            <th>Detected Flows</th>
+        </tr>
+        </thead>
+        <tbody>
+<tr><td>Database → Mapper</td><td>0</td></tr><tr><td>Mapper → Java DTO</td><td>8</td></tr><tr><td>Java DTO → API</td><td>8</td></tr>        </tbody>
+    </table>
+</div>
+    <div class="footer">
+        Generated by PrivacyOps 0.1.0
+    </div>
+
+</div>
+</body>
+</html>
