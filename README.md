@@ -534,7 +534,7 @@ A human-readable report provides a visual summary of:
 - findings
 - evidence
 - policy status
-- 
+
 ### Report Overview
 
 <img width="1251" height="804" alt="Image" src="https://github.com/user-attachments/assets/3eee3cb5-893c-48b8-a7e3-3dd8a4d79a8c" />
